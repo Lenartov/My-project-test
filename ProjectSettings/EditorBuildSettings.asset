@@ -6,8 +6,20 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
+    path: Assets/TextTest/TextMorpherTest.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/RealtimeCardPrototype/Scenes/RealtimeCardPrototype.unity
+    guid: d66024ca36cb4a72bf61a3ac8c2b47ed
+  - enabled: 1
+    path: Assets/RealtimeCardPrototype/Scenes/BossRealtimeCardPrototype.unity
+    guid: 0eb13742a005484fb92af3763cf7d021
+  - enabled: 1
+    path: Assets/RealtimeCardPrototype/Scenes/OverworldPrototype.unity
+    guid: 5a31d3f48e7c467985e8cebfdd9db10e
+  - enabled: 1
+    path: Assets/RealtimeCardPrototype/Scenes/OverworldTrainingBattle.unity
+    guid: 8a275c3b474b4b659e420adc4ea58e51
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
