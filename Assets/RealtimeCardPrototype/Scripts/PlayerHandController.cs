@@ -16,6 +16,7 @@ namespace RealtimeCardPrototype
         [SerializeField] private int powerCardCount = 2;
         [SerializeField] private int manaGeneratorCardCount = 1;
         [SerializeField] private int manaCapacityCardCount = 1;
+        [SerializeField] private int turretCardCount = 1;
         [SerializeField] private int startingHandCount = 5;
         [SerializeField] private int maxHandSize = 5;
         [SerializeField] private float drawInterval = 1f;
@@ -43,6 +44,7 @@ namespace RealtimeCardPrototype
 
         private readonly List<IHandCard> cards = new List<IHandCard>();
         private readonly Dictionary<IHandCard, CardDefinition> cardDefinitions = new Dictionary<IHandCard, CardDefinition>();
+        private readonly Queue<CardDefinition> returningCards = new Queue<CardDefinition>();
         private CardDeckRuntime deck;
         private float drawTimer;
         private PlayerManaState manaState;
@@ -66,7 +68,8 @@ namespace RealtimeCardPrototype
             int manaGenerator,
             int manaCapacity,
             int startingHand,
-            int maxHand)
+            int maxHand,
+            int turret = 0)
         {
             normalCardCount = Mathf.Max(0, normal);
             heavyCardCount = Mathf.Max(0, heavy);
@@ -79,6 +82,7 @@ namespace RealtimeCardPrototype
             powerCardCount = Mathf.Max(0, power);
             manaGeneratorCardCount = Mathf.Max(0, manaGenerator);
             manaCapacityCardCount = Mathf.Max(0, manaCapacity);
+            turretCardCount = Mathf.Max(0, turret);
             maxHandSize = Mathf.Max(1, maxHand);
             startingHandCount = Mathf.Clamp(startingHand, 0, maxHandSize);
         }
@@ -157,7 +161,15 @@ namespace RealtimeCardPrototype
 
             if (cardDefinitions.TryGetValue(card, out CardDefinition definition))
             {
-                deck.Discard(definition);
+                if (definition.Kind == CardKind.Turret)
+                {
+                    returningCards.Enqueue(definition);
+                }
+                else
+                {
+                    deck.Discard(definition);
+                }
+
                 cardDefinitions.Remove(card);
             }
 
@@ -178,6 +190,11 @@ namespace RealtimeCardPrototype
 
         private void AddDrawProgress(float seconds)
         {
+            while (returningCards.Count > 0 && cards.Count < maxHandSize)
+            {
+                AddCardToHand(returningCards.Dequeue(), true);
+            }
+
             drawTimer += seconds;
 
             if (drawTimer < drawInterval)
@@ -235,7 +252,8 @@ namespace RealtimeCardPrototype
                 shieldBlockerCardCount,
                 powerCardCount,
                 manaGeneratorCardCount,
-                manaCapacityCardCount);
+                manaCapacityCardCount,
+                turretCardCount);
             PrototypeCardPalette palette = new PrototypeCardPalette(
                 attackCardColor,
                 heavyAttackCardColor,
@@ -263,11 +281,16 @@ namespace RealtimeCardPrototype
                 return false;
             }
 
+            AddCardToHand(definition, snap);
+            return true;
+        }
+
+        private void AddCardToHand(CardDefinition definition, bool snap)
+        {
             IHandCard card = CreateHandCard(definition);
             cards.Add(card);
             cardDefinitions.Add(card, definition);
             ReflowHand(snap);
-            return true;
         }
 
         private IHandCard CreateHandCard(CardDefinition definition)

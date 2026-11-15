@@ -21,7 +21,7 @@ namespace RealtimeCardPrototype
 
         public event Action<IHandCard> LeftHand;
         public event Action<IHandCard> Played;
-        public Func<int, bool> TryPayMana;
+        public Func<int, bool> TryPayMana { get; set; }
 
         private static readonly Collider[] AreaHits = new Collider[32];
         private readonly HashSet<EnemyDummyCard> enemiesInTick = new HashSet<EnemyDummyCard>();
@@ -264,7 +264,7 @@ namespace RealtimeCardPrototype
         {
             GameObject root = new GameObject("Graviton Timer Bar");
             root.transform.SetParent(transform, false);
-            root.transform.localPosition = new Vector3(0f, 0.116f, 0.54f);
+            root.transform.localPosition = new Vector3(0f, cardView.OverlayHeight, 0.63f);
 
             GameObject background = GameObject.CreatePrimitive(PrimitiveType.Cube);
             background.name = "Graviton Bar Background";

@@ -26,16 +26,18 @@ namespace RealtimeCardPrototype
 
     public enum CardKind
     {
-        Attack,
-        SplashAttack,
-        ShockMark,
-        PoisonHover,
-        PierceAttack,
-        Graviton,
-        ShieldBlocker,
-        PowerBoost,
-        ManaGenerator,
-        ManaCapacity
+        Strike = 0,
+        Heavy = 1,
+        Blast = 2,
+        Shock = 3,
+        Poison = 4,
+        Pierce = 5,
+        Grav = 6,
+        Block = 7,
+        Power = 8,
+        Focus = 9,
+        Well = 10,
+        Turret = 11
     }
 
     public sealed class CardDeckRuntime

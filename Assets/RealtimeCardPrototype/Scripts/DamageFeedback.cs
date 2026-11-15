@@ -49,9 +49,9 @@ namespace RealtimeCardPrototype
             Spawn(damage, position, new Color(1f, 0.12f, 0.08f));
         }
 
-        public static void Spawn(float damage, Vector3 position, Color color)
+        public static void Spawn(float damage, Vector3 position, Color color, string format = "0")
         {
-            Spawn($"-{damage:0}", position, color);
+            Spawn("-" + damage.ToString(format), position, color);
         }
 
         public static void SpawnHealing(float amount, Vector3 position, Color color)

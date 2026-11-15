@@ -238,7 +238,7 @@ namespace RealtimeCardPrototype
                 new Color(0.92f, 0.68f, 0.12f),
                 new Color(0.18f, 0.76f, 0.95f),
                 new Color(0.38f, 0.52f, 1f));
-            PrototypeDeckCounts counts = new PrototypeDeckCounts(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+            PrototypeDeckCounts counts = new PrototypeDeckCounts(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, turret: 1);
             rewardPool.AddRange(PrototypeDeckBuilder.Create(counts, palette));
         }
 

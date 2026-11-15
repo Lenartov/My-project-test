@@ -39,12 +39,6 @@ namespace RealtimeCardPrototype
             ClampToAnchor();
         }
 
-        public void Configure(float separationRadius, float maxOffset)
-        {
-            radius = Mathf.Max(0.05f, separationRadius);
-            maxAnchorOffset = Mathf.Max(0.05f, maxOffset);
-        }
-
         public void Activate(bool dragging)
         {
             isActive = true;

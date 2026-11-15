@@ -12,6 +12,11 @@ namespace RealtimeCardPrototype
 
         private void OnTriggerEnter(Collider other)
         {
+            if (!IsActiveOnField)
+            {
+                return;
+            }
+
             IPowerBoostTarget card = FindPowerBoostTarget(other);
             if (card == null || !card.IsDragging || cardsInside.Contains(card))
             {

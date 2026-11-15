@@ -8,7 +8,8 @@ namespace RealtimeCardPrototype
         Splash,
         Poison,
         ShockChain,
-        Graviton
+        Graviton,
+        TurretShot
     }
 
     public readonly struct EnemyDamageEvent

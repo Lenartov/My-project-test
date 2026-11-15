@@ -39,7 +39,8 @@ namespace RealtimeCardPrototype
                 manaGenerator: 0,
                 manaCapacity: 0,
                 startingHand: 5,
-                maxHand: 5);
+                maxHand: 5,
+                turret: OverworldDeckState.GetActiveCardCount("turret"));
         }
 
         private void CreateEnemy()

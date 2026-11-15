@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace RealtimeCardPrototype
 {
+    [DefaultExecutionOrder(-100)]
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(BoxCollider))]
     public sealed class CardView : MonoBehaviour
@@ -10,14 +11,22 @@ namespace RealtimeCardPrototype
         [SerializeField] private TextMesh titleText;
         [SerializeField] private TextMesh bodyText;
         [SerializeField] private Renderer bodyRenderer;
+        [SerializeField] private Transform model;
+        [SerializeField] private float overlayHeight = 0.116f;
 
+        private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
+        private static readonly int ColorId = Shader.PropertyToID("_Color");
         private readonly Renderer[] powerOutlineRenderers = new Renderer[4];
+        private Renderer[] modelRenderers;
+        private CardMotionEffects motionEffects;
         private Color baseBodyColor = Color.white;
         private Color baseTextColor = Color.white;
 
         public CardTeam Team => team;
         public Rigidbody Body { get; private set; }
         public BoxCollider Collider { get; private set; }
+        public float OverlayHeight => overlayHeight;
+        internal CardKind Kind { get; private set; }
 
         private void Awake()
         {
@@ -65,6 +74,11 @@ namespace RealtimeCardPrototype
                 }
             }
 
+            if (modelRenderers != null)
+            {
+                SetModelAvailability(isAvailable);
+            }
+
             if (titleText != null)
             {
                 titleText.color = textColor;
@@ -73,6 +87,71 @@ namespace RealtimeCardPrototype
             if (bodyText != null)
             {
                 bodyText.color = textColor;
+            }
+        }
+
+        public void ConfigurePlayer(CardDefinition definition, Vector2 size)
+        {
+            Kind = definition.Kind;
+            Vector3 colliderSize = Collider.size;
+            Vector3 modelScale = model.localScale;
+            modelScale.x *= size.x / colliderSize.x;
+            modelScale.z *= size.y / colliderSize.z;
+            model.localScale = modelScale;
+            Collider.size = new Vector3(size.x, colliderSize.y, size.y);
+            modelRenderers = model.GetComponentsInChildren<Renderer>();
+
+            titleText = CreateText("Title", transform, new Vector3(0f, overlayHeight, size.y * 0.33f), 0.073f, FontStyle.Bold);
+            bodyText = CreateText("BodyText", transform, new Vector3(0f, overlayHeight, -size.y * 0.25f), 0.043f, FontStyle.Normal);
+            Configure(CardTeam.Player, definition.Title, definition.Body, definition.Color, Color.white);
+            CreatePowerOutline(size);
+            switch (Kind)
+            {
+                case CardKind.Strike:
+                case CardKind.Heavy:
+                case CardKind.Blast:
+                case CardKind.Block:
+                    motionEffects = gameObject.AddComponent<CardMotionEffects>();
+                    motionEffects.Configure(Kind, GetComponent<IHandCard>(), size.x, overlayHeight);
+                    break;
+                default:
+                    AddMotionTrail(gameObject, definition.Color);
+                    break;
+            }
+        }
+
+        internal void ReleaseMotionEffects()
+        {
+            if (motionEffects != null)
+            {
+                motionEffects.Release();
+                motionEffects = null;
+            }
+        }
+
+        private void SetModelAvailability(bool isAvailable)
+        {
+            MaterialPropertyBlock properties = new MaterialPropertyBlock();
+            foreach (Renderer renderer in modelRenderers)
+            {
+                Material[] materials = renderer.sharedMaterials;
+                for (int index = 0; index < materials.Length; index++)
+                {
+                    if (isAvailable)
+                    {
+                        renderer.SetPropertyBlock(null, index);
+                        continue;
+                    }
+
+                    Material material = materials[index];
+                    int colorId = material.HasProperty(BaseColorId) ? BaseColorId : ColorId;
+                    Color originalColor = material.GetColor(colorId);
+                    Color color = Color.Lerp(originalColor, Color.gray * 0.55f, 0.75f);
+                    color.a = originalColor.a;
+                    properties.SetColor(colorId, color);
+                    renderer.SetPropertyBlock(properties, index);
+                    properties.Clear();
+                }
             }
         }
 
@@ -138,13 +217,6 @@ namespace RealtimeCardPrototype
             view.bodyText = bodyText;
             view.Configure(team, name, string.Empty, color, Color.white);
 
-            if (team == CardTeam.Player)
-            {
-                view.CreatePowerOutline(size);
-                AddMotionTrail(root, color);
-                root.AddComponent<CardActivityReporter>();
-            }
-
             return view;
         }
 
@@ -194,10 +266,10 @@ namespace RealtimeCardPrototype
         private void CreatePowerOutline(Vector2 size)
         {
             Color color = GetPowerOutlineColor(1);
-            powerOutlineRenderers[0] = CreateOutlineSegment("Power Outline Top", new Vector3(0f, 0.121f, size.y * 0.5f), new Vector3(size.x + 0.1f, 0.026f, 0.045f), color);
-            powerOutlineRenderers[1] = CreateOutlineSegment("Power Outline Bottom", new Vector3(0f, 0.121f, -size.y * 0.5f), new Vector3(size.x + 0.1f, 0.026f, 0.045f), color);
-            powerOutlineRenderers[2] = CreateOutlineSegment("Power Outline Left", new Vector3(-size.x * 0.5f, 0.121f, 0f), new Vector3(0.045f, 0.026f, size.y + 0.1f), color);
-            powerOutlineRenderers[3] = CreateOutlineSegment("Power Outline Right", new Vector3(size.x * 0.5f, 0.121f, 0f), new Vector3(0.045f, 0.026f, size.y + 0.1f), color);
+            powerOutlineRenderers[0] = CreateOutlineSegment("Power Outline Top", new Vector3(0f, overlayHeight, size.y * 0.5f), new Vector3(size.x + 0.1f, 0.026f, 0.045f), color);
+            powerOutlineRenderers[1] = CreateOutlineSegment("Power Outline Bottom", new Vector3(0f, overlayHeight, -size.y * 0.5f), new Vector3(size.x + 0.1f, 0.026f, 0.045f), color);
+            powerOutlineRenderers[2] = CreateOutlineSegment("Power Outline Left", new Vector3(-size.x * 0.5f, overlayHeight, 0f), new Vector3(0.045f, 0.026f, size.y + 0.1f), color);
+            powerOutlineRenderers[3] = CreateOutlineSegment("Power Outline Right", new Vector3(size.x * 0.5f, overlayHeight, 0f), new Vector3(0.045f, 0.026f, size.y + 0.1f), color);
             SetPowerOutline(0);
         }
 

@@ -250,6 +250,22 @@ namespace RealtimeCardPrototype
                 "GRAV"));
         }
 
+        internal void ReceiveTurretShot(float damage, Color color)
+        {
+            ApplyDamage(new EnemyDamageEvent(
+                EnemyDamageKind.TurretShot,
+                damage,
+                0f,
+                false,
+                false,
+                Vector3.zero,
+                true,
+                true,
+                Vector3.zero,
+                color,
+                "TURRET"));
+        }
+
         public void ApplyPoisonHover(float deltaTime, float damageMultiplier = 1f)
         {
             if (isDying)
@@ -291,7 +307,7 @@ namespace RealtimeCardPrototype
 
         public EnemyAttackPlan CreateEnemyAttackPlan(EnemyAttackTargetMode mode, int hitCount, float hitInterval, float damage)
         {
-            EnemyAttackPlan plan = attackExecutor.CreatePlan(mode);
+            EnemyAttackPlan plan = attackExecutor.CreatePlan(mode, hitCount == 1 && damage > 0f);
             if (!plan.HasPlayerTarget)
             {
                 return plan;
@@ -378,7 +394,8 @@ namespace RealtimeCardPrototype
 
             if (damageEvent.ShowPopup)
             {
-                DamagePopup.Spawn(damageEvent.Damage, transform.position + damageEvent.PopupOffset, damageEvent.PopupColor);
+                string format = damageEvent.Kind == EnemyDamageKind.TurretShot ? "0.##" : "0";
+                DamagePopup.Spawn(damageEvent.Damage, transform.position + damageEvent.PopupOffset, damageEvent.PopupColor, format);
             }
 
             if (damageEvent.TriggerShockChain)

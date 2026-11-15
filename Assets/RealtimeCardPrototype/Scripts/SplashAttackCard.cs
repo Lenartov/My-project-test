@@ -15,7 +15,7 @@ namespace RealtimeCardPrototype
         [SerializeField] private int manaCost = 3;
 
         public event Action<IHandCard> Played;
-        public Func<int, bool> TryPayMana;
+        public Func<int, bool> TryPayMana { get; set; }
 
         private static readonly Collider[] SplashHits = new Collider[24];
         private readonly HashSet<EnemyDummyCard> splashEnemies = new HashSet<EnemyDummyCard>();
@@ -143,6 +143,12 @@ namespace RealtimeCardPrototype
 
             DamageResult directHit = mainEnemy.ReceiveHit(boostedProfile, lastPosition, smoothedVelocity, contact.point);
             ApplySplashDamage(directHit, mainEnemy, contact.point);
+            if (directHit.Damage > 0f)
+            {
+                cardView.ReleaseMotionEffects();
+                CardCombatEffects.Blast(contact.point + Vector3.up * 0.13f, splashRadius);
+            }
+
             Played?.Invoke(this);
             Destroy(gameObject);
         }

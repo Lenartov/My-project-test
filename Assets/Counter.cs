@@ -11,7 +11,7 @@ public class Counter : MonoBehaviour
     {
         textField = GetComponent<TextMeshProUGUI>();
         textField.text = value.ToString();
-    }
+	}
 
     public void Count()
     {

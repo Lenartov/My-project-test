@@ -16,8 +16,9 @@ namespace RealtimeCardPrototype
         public readonly int Power;
         public readonly int ManaGenerator;
         public readonly int ManaCapacity;
+        public readonly int Turret;
 
-        public int Total => Normal + Heavy + Splash + Shock + Poison + Pierce + Graviton + ShieldBlocker + Power + ManaGenerator + ManaCapacity;
+        public int Total => Normal + Heavy + Splash + Shock + Poison + Pierce + Graviton + ShieldBlocker + Power + ManaGenerator + ManaCapacity + Turret;
 
         public PrototypeDeckCounts(
             int normal,
@@ -30,7 +31,8 @@ namespace RealtimeCardPrototype
             int shieldBlocker,
             int power,
             int manaGenerator,
-            int manaCapacity)
+            int manaCapacity,
+            int turret)
         {
             Normal = normal;
             Heavy = heavy;
@@ -43,6 +45,7 @@ namespace RealtimeCardPrototype
             Power = power;
             ManaGenerator = manaGenerator;
             ManaCapacity = manaCapacity;
+            Turret = turret;
         }
     }
 
@@ -89,6 +92,9 @@ namespace RealtimeCardPrototype
 
     internal static class PrototypeDeckBuilder
     {
+        internal static readonly CardDefinition Turret = new CardDefinition(
+            CardKind.Turret, "TURRET", $"cost {TurretCard.Cost}\nauto-fire", TurretCard.Cost, new Color(0.18f, 0.85f, 0.64f), default);
+
         public static List<CardDefinition> Create(PrototypeDeckCounts counts, PrototypeCardPalette palette)
         {
             List<CardDefinition> definitions = new List<CardDefinition>(counts.Total);
@@ -99,17 +105,18 @@ namespace RealtimeCardPrototype
             CardHitProfile shockProfile = CreateShockProfile();
             CardHitProfile pierceProfile = CreatePierceProfile();
 
-            AddCopies(definitions, new CardDefinition(CardKind.Attack, "STRIKE", "cost 1", 1, palette.Attack, normalProfile), counts.Normal);
-            AddCopies(definitions, new CardDefinition(CardKind.Attack, "HEAVY", "cost 2", 2, palette.HeavyAttack, heavyProfile), counts.Heavy);
-            AddCopies(definitions, new CardDefinition(CardKind.SplashAttack, "BLAST", "cost 3\nsplash", 3, palette.Splash, splashProfile), counts.Splash);
-            AddCopies(definitions, new CardDefinition(CardKind.ShockMark, "SHOCK", "cost 2\nzap", 2, palette.Shock, shockProfile), counts.Shock);
-            AddCopies(definitions, new CardDefinition(CardKind.PoisonHover, "POISON", "cost 2\nhover", 2, palette.Poison, default), counts.Poison);
-            AddCopies(definitions, new CardDefinition(CardKind.PierceAttack, "PIERCE", "cost 2\nphase", 2, palette.Pierce, pierceProfile), counts.Pierce);
-            AddCopies(definitions, new CardDefinition(CardKind.Graviton, "GRAV", "cost 4\npull", 4, palette.Graviton, default), counts.Graviton);
-            AddCopies(definitions, new CardDefinition(CardKind.ShieldBlocker, "BLOCK", "cost 1\nblock 3", 1, palette.ShieldBlocker, default), counts.ShieldBlocker);
-            AddCopies(definitions, new CardDefinition(CardKind.PowerBoost, "POWER", "cost 3\nboost", 3, palette.Power, default), counts.Power);
-            AddCopies(definitions, new CardDefinition(CardKind.ManaGenerator, "FOCUS", "cost 2\nmana", 2, palette.ManaGenerator, default), counts.ManaGenerator);
-            AddCopies(definitions, new CardDefinition(CardKind.ManaCapacity, "WELL", "cost 3\nmax +1", 3, palette.ManaCapacity, default), counts.ManaCapacity);
+            AddCopies(definitions, new CardDefinition(CardKind.Strike, "STRIKE", "cost 1", 1, palette.Attack, normalProfile), counts.Normal);
+            AddCopies(definitions, new CardDefinition(CardKind.Heavy, "HEAVY", "cost 2", 2, palette.HeavyAttack, heavyProfile), counts.Heavy);
+            AddCopies(definitions, new CardDefinition(CardKind.Blast, "BLAST", "cost 3\nsplash", 3, palette.Splash, splashProfile), counts.Splash);
+            AddCopies(definitions, new CardDefinition(CardKind.Shock, "SHOCK", "cost 2\nzap", 2, palette.Shock, shockProfile), counts.Shock);
+            AddCopies(definitions, new CardDefinition(CardKind.Poison, "POISON", "cost 2\nhover", 2, palette.Poison, default), counts.Poison);
+            AddCopies(definitions, new CardDefinition(CardKind.Pierce, "PIERCE", "cost 2\nphase", 2, palette.Pierce, pierceProfile), counts.Pierce);
+            AddCopies(definitions, new CardDefinition(CardKind.Grav, "GRAV", "cost 4\npull", 4, palette.Graviton, default), counts.Graviton);
+            AddCopies(definitions, new CardDefinition(CardKind.Block, "BLOCK", "cost 1\nblock 3", 1, palette.ShieldBlocker, default), counts.ShieldBlocker);
+            AddCopies(definitions, new CardDefinition(CardKind.Power, "POWER", "cost 3\nboost", 3, palette.Power, default), counts.Power);
+            AddCopies(definitions, new CardDefinition(CardKind.Focus, "FOCUS", "cost 2\nmana", 2, palette.ManaGenerator, default), counts.ManaGenerator);
+            AddCopies(definitions, new CardDefinition(CardKind.Well, "WELL", "cost 3\nmax +1", 3, palette.ManaCapacity, default), counts.ManaCapacity);
+            AddCopies(definitions, Turret, counts.Turret);
 
             return definitions;
         }

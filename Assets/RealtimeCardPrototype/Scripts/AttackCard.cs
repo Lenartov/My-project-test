@@ -15,7 +15,7 @@ namespace RealtimeCardPrototype
         [SerializeField] private int manaCost = 1;
 
         public event Action<IHandCard> Played;
-        public Func<int, bool> TryPayMana;
+        public Func<int, bool> TryPayMana { get; set; }
 
         private CardView cardView;
         private Rigidbody body;
@@ -147,7 +147,13 @@ namespace RealtimeCardPrototype
             hasBeenPlayed = true;
             CardHitProfile boostedProfile = hitProfile;
             boostedProfile.damage *= PowerMultiplier;
-            enemy.ReceiveHit(boostedProfile, lastPosition, smoothedVelocity, contact.point);
+            DamageResult hit = enemy.ReceiveHit(boostedProfile, lastPosition, smoothedVelocity, contact.point);
+            if (hit.Damage > 0f)
+            {
+                cardView.ReleaseMotionEffects();
+                CardCombatEffects.Strike(contact.point + Vector3.up * 0.13f, smoothedVelocity, cardView.Kind == CardKind.Heavy);
+            }
+
             Played?.Invoke(this);
             Destroy(gameObject);
         }

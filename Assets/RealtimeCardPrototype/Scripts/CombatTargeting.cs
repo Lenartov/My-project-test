@@ -124,7 +124,7 @@ namespace RealtimeCardPrototype
             }
         }
 
-        public static bool TryGetStructureTarget(Vector3 origin, out IEnemyAttackTarget target)
+        public static bool TryGetStructureTarget(Vector3 origin, out IEnemyAttackTarget target, bool turretOnly = false)
         {
             target = null;
             int bestPriority = int.MinValue;
@@ -139,7 +139,7 @@ namespace RealtimeCardPrototype
                     continue;
                 }
 
-                if (!candidate.CanBeDirectTarget)
+                if (!candidate.CanBeDirectTarget || (turretOnly && candidate is not TurretCard))
                 {
                     continue;
                 }

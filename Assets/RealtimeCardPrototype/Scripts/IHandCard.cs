@@ -8,6 +8,7 @@ namespace RealtimeCardPrototype
     {
         event Action<IHandCard> LeftHand;
         event Action<IHandCard> Played;
+        Func<int, bool> TryPayMana { get; set; }
         int ManaCost { get; }
         bool IsDragging { get; }
         Transform Transform { get; }

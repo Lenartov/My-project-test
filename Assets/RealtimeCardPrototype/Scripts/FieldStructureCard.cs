@@ -4,6 +4,7 @@ using UnityEngine;
 namespace RealtimeCardPrototype
 {
     [RequireComponent(typeof(CardView))]
+    [RequireComponent(typeof(FieldPlacementBody))]
     public abstract class FieldStructureCard : MonoBehaviour, IHandCard, IEnemyAttackTarget
     {
         private const float HealthBarWidth = 0.72f;
@@ -15,7 +16,7 @@ namespace RealtimeCardPrototype
 
         public event Action<IHandCard> LeftHand;
         public event Action<IHandCard> Played;
-        public Func<int, bool> TryPayMana;
+        public Func<int, bool> TryPayMana { get; set; }
         public Action<int> RefundMana;
 
         private CardView cardView;
@@ -61,8 +62,7 @@ namespace RealtimeCardPrototype
             cardView = GetComponent<CardView>();
             body = cardView.Body;
             cardCollider = cardView.Collider;
-            fieldPlacement = gameObject.AddComponent<FieldPlacementBody>();
-            fieldPlacement.Configure(0.74f, 0.23f);
+            fieldPlacement = GetComponent<FieldPlacementBody>();
             mainCamera = Camera.main;
             manaCost = DefaultManaCost;
             currentHealth = InitialMaxHealth;
@@ -282,7 +282,7 @@ namespace RealtimeCardPrototype
         {
             GameObject root = new GameObject("HP Bar");
             root.transform.SetParent(transform, false);
-            root.transform.localPosition = new Vector3(0f, 0.116f, -0.56f);
+            root.transform.localPosition = new Vector3(0f, cardView.OverlayHeight, -0.61f);
 
             GameObject background = GameObject.CreatePrimitive(PrimitiveType.Cube);
             background.name = "HP Bar Background";
@@ -300,7 +300,7 @@ namespace RealtimeCardPrototype
 
             GameObject labelObject = new GameObject("HP Label");
             labelObject.transform.SetParent(root.transform, false);
-            labelObject.transform.localPosition = new Vector3(0f, 0.022f, 0.082f);
+            labelObject.transform.localPosition = new Vector3(0f, 0.022f, -0.075f);
             labelObject.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
 
             healthText = labelObject.AddComponent<TextMesh>();

@@ -145,12 +145,13 @@ namespace RealtimeCardPrototype
 
             return new List<OverworldCardEntry>
             {
-                Entry("strike", "Starter Warrior", CardKind.Attack, "STRIKE", "cost 1\nDirect hit", 1, Color.white, basic, 5),
-                Entry("heavy", "Starter Warrior", CardKind.Attack, "HEAVY", "cost 2\nStrong hit", 2, new Color(0.72f, 0.24f, 0.82f), heavy, 5),
-                Entry("block", "Starter Warrior", CardKind.ShieldBlocker, "BLOCK", "cost 1\nBlock 3", 1, new Color(0.78f, 0.82f, 0.84f), default, 5),
-                Entry("blast", "Storm Mage", CardKind.SplashAttack, "BLAST", "cost 3\nArcane burst", 3, new Color(0.92f, 0.06f, 0.04f), splash, 2),
-                Entry("shock", "Storm Mage", CardKind.ShockMark, "SHOCK", "cost 2\nLightning mark", 2, new Color(0.1f, 0.46f, 1f), shock, 3),
-                Entry("pierce", "Storm Mage", CardKind.PierceAttack, "PIERCE", "cost 2\nPhase strike", 2, new Color(0.12f, 0.82f, 0.86f), pierce, 2)
+                Entry("strike", "Starter Warrior", CardKind.Strike, "STRIKE", "cost 1\nDirect hit", 1, Color.white, basic, 5),
+                Entry("heavy", "Starter Warrior", CardKind.Heavy, "HEAVY", "cost 2\nStrong hit", 2, new Color(0.72f, 0.24f, 0.82f), heavy, 5),
+                Entry("block", "Starter Warrior", CardKind.Block, "BLOCK", "cost 1\nBlock 3", 1, new Color(0.78f, 0.82f, 0.84f), default, 5),
+                new OverworldCardEntry("turret", "Starter Warrior", PrototypeDeckBuilder.Turret, 1),
+                Entry("blast", "Storm Mage", CardKind.Blast, "BLAST", "cost 3\nArcane burst", 3, new Color(0.92f, 0.06f, 0.04f), splash, 2),
+                Entry("shock", "Storm Mage", CardKind.Shock, "SHOCK", "cost 2\nLightning mark", 2, new Color(0.1f, 0.46f, 1f), shock, 3),
+                Entry("pierce", "Storm Mage", CardKind.Pierce, "PIERCE", "cost 2\nPhase strike", 2, new Color(0.12f, 0.82f, 0.86f), pierce, 2)
             };
         }
 
@@ -164,7 +165,7 @@ namespace RealtimeCardPrototype
                     continue;
                 }
 
-                for (int copyIndex = 0; copyIndex < entry.TotalCopies; copyIndex++)
+                for (int copyIndex = 0; copyIndex < entry.TotalCopies && activeCardIds.Count < ActiveDeckLimit; copyIndex++)
                 {
                     activeCardIds.Add(entry.Id);
                 }

@@ -6,6 +6,7 @@ namespace RealtimeCardPrototype
 {
     internal sealed class EnemyAttackExecutor
     {
+        private const float TurretTargetChance = 0.25f;
         private readonly Transform owner;
         private readonly Func<bool> isDying;
 
@@ -20,7 +21,7 @@ namespace RealtimeCardPrototype
             this.isDying = isDying;
         }
 
-        public EnemyAttackPlan CreatePlan(EnemyAttackTargetMode mode)
+        public EnemyAttackPlan CreatePlan(EnemyAttackTargetMode mode, bool canRetargetTurret = false)
         {
             Vector3 source = GetAttackSource();
             if (mode == EnemyAttackTargetMode.Structure && CombatTargetRegistry.TryGetStructureTarget(source, out IEnemyAttackTarget structureTarget))
@@ -31,6 +32,12 @@ namespace RealtimeCardPrototype
             if (mode == EnemyAttackTargetMode.Structure)
             {
                 return new EnemyAttackPlan(mode, null, null, source);
+            }
+
+            if (canRetargetTurret && CombatTargetRegistry.TryGetStructureTarget(source, out IEnemyAttackTarget turret, turretOnly: true)
+                && UnityEngine.Random.value < TurretTargetChance)
+            {
+                return new EnemyAttackPlan(EnemyAttackTargetMode.Structure, turret, null, turret.TargetPoint);
             }
 
             IPlayerDamageReceiver player = CombatTargetRegistry.Player;
@@ -101,7 +108,7 @@ namespace RealtimeCardPrototype
             if (CombatTargetRegistry.TryGetAttackInterceptor(source, targetPoint, out IEnemyAttackTarget interceptor))
             {
                 interceptor.ReceiveEnemyAttack(damage);
-                EnemyAttackProjectile.Spawn(source, interceptor.TargetPoint, damage);
+                AttackProjectile.Spawn(source, interceptor.TargetPoint, damage);
                 Debug.Log($"{owner.name} attack intercepted by {interceptor.TargetTransform.name} for {damage:0.0}");
                 return;
             }
@@ -109,7 +116,7 @@ namespace RealtimeCardPrototype
             if (plan.HasStructureTarget && plan.StructureTarget.IsTargetable)
             {
                 plan.StructureTarget.ReceiveEnemyAttack(damage);
-                EnemyAttackProjectile.Spawn(source, plan.StructureTarget.TargetPoint, damage);
+                AttackProjectile.Spawn(source, plan.StructureTarget.TargetPoint, damage);
                 Debug.Log($"{owner.name} attacks structure {plan.StructureTarget.TargetTransform.name} for {damage:0.0}");
                 return;
             }
@@ -117,7 +124,7 @@ namespace RealtimeCardPrototype
             if (plan.HasPlayerTarget)
             {
                 plan.PlayerTarget.ReceiveEnemyAttack(damage);
-                EnemyAttackProjectile.Spawn(source, targetPoint, damage);
+                AttackProjectile.Spawn(source, targetPoint, damage);
                 Debug.Log($"{owner.name} attacks player for {damage:0.0}");
             }
         }
@@ -138,9 +145,9 @@ namespace RealtimeCardPrototype
                 }
 
                 Vector3 blockTargetPoint = block.TargetPoint;
-                EnemyAttackProjectile.Spawn(previousPoint, blockTargetPoint, remainingDamage);
+                AttackProjectile.Spawn(previousPoint, blockTargetPoint, remainingDamage);
+                remainingDamage = block.AbsorbEnemyAttack(remainingDamage, previousPoint);
                 previousPoint = blockTargetPoint;
-                remainingDamage = block.AbsorbEnemyAttack(remainingDamage);
             }
 
             for (; blockIndex < blocks.Count; blockIndex++)
@@ -158,7 +165,7 @@ namespace RealtimeCardPrototype
                     ? plan.Sequence.GetHitTargetPoint(plan.TargetPoint, hitIndex)
                     : plan.TargetPoint;
                 plan.PlayerTarget.ReceiveEnemyAttack(remainingDamage);
-                EnemyAttackProjectile.Spawn(previousPoint, playerTargetPoint, remainingDamage);
+                AttackProjectile.Spawn(previousPoint, playerTargetPoint, remainingDamage);
             }
         }
 

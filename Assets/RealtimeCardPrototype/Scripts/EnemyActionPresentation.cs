@@ -303,20 +303,33 @@ namespace RealtimeCardPrototype
         }
     }
 
-    public sealed class EnemyAttackProjectile : MonoBehaviour
+    public sealed class AttackProjectile : MonoBehaviour
     {
         private Transform projectile;
         private Vector3 start;
         private Vector3 end;
         private TextMesh damageText;
+        private Material material;
         private Camera mainCamera;
         private float age;
-        private const float Lifetime = 0.3f;
+        internal const float TravelTime = 0.3f;
 
         public static void Spawn(Vector3 start, Vector3 end, float damage)
         {
-            GameObject projectileObject = new GameObject("Enemy Attack Projectile");
-            EnemyAttackProjectile projectile = projectileObject.AddComponent<EnemyAttackProjectile>();
+            AttackProjectile projectile = Create(start, end, new Color(1f, 0.02f, 0.01f));
+            projectile.damageText = CreateDamageText(projectile.transform, damage);
+            projectile.UpdateProjectile(0f);
+        }
+
+        public static void Spawn(Vector3 start, Vector3 end, Color color)
+        {
+            Create(start, end, color).UpdateProjectile(0f);
+        }
+
+        private static AttackProjectile Create(Vector3 start, Vector3 end, Color color)
+        {
+            GameObject projectileObject = new GameObject("Attack Projectile");
+            AttackProjectile projectile = projectileObject.AddComponent<AttackProjectile>();
             projectile.start = start;
             projectile.end = end;
             projectile.mainCamera = Camera.main;
@@ -325,23 +338,28 @@ namespace RealtimeCardPrototype
             sphere.name = "Projectile Sphere";
             sphere.transform.SetParent(projectileObject.transform, false);
             sphere.transform.localScale = Vector3.one * 0.17f;
-            sphere.GetComponent<Renderer>().sharedMaterial = PrototypeMaterials.Create(new Color(1f, 0.02f, 0.01f), 0.16f);
+            projectile.material = PrototypeMaterials.Create(color, 0.16f);
+            sphere.GetComponent<Renderer>().sharedMaterial = projectile.material;
             Collider collider = sphere.GetComponent<Collider>();
             collider.enabled = false;
             Destroy(collider);
 
             projectile.projectile = sphere.transform;
-            projectile.damageText = CreateDamageText(projectileObject.transform, damage);
-            projectile.UpdateProjectile(0f);
+            return projectile;
+        }
+
+        private void OnDestroy()
+        {
+            Destroy(material);
         }
 
         private void Update()
         {
             age += Time.deltaTime;
-            float amount = Mathf.Clamp01(age / Lifetime);
+            float amount = Mathf.Clamp01(age / TravelTime);
             UpdateProjectile(amount);
 
-            if (age >= Lifetime)
+            if (age >= TravelTime)
             {
                 Destroy(gameObject);
             }

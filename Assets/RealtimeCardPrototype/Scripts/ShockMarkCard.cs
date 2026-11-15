@@ -14,7 +14,7 @@ namespace RealtimeCardPrototype
         [SerializeField] private int manaCost = 2;
 
         public event Action<IHandCard> Played;
-        public Func<int, bool> TryPayMana;
+        public Func<int, bool> TryPayMana { get; set; }
 
         private CardView cardView;
         private Rigidbody body;

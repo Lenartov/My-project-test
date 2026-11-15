@@ -18,7 +18,7 @@ namespace RealtimeCardPrototype
 
         public event Action<IHandCard> LeftHand;
         public event Action<IHandCard> Played;
-        public Func<int, bool> TryPayMana;
+        public Func<int, bool> TryPayMana { get; set; }
 
         private readonly HashSet<EnemyDummyCard> enemiesInside = new HashSet<EnemyDummyCard>();
         private CardView cardView;
@@ -374,7 +374,7 @@ namespace RealtimeCardPrototype
         {
             GameObject root = new GameObject("Charge Bar");
             root.transform.SetParent(transform, false);
-            root.transform.localPosition = new Vector3(0f, 0.116f, 0.54f);
+            root.transform.localPosition = new Vector3(0f, cardView.OverlayHeight, 0.63f);
 
             GameObject background = GameObject.CreatePrimitive(PrimitiveType.Cube);
             background.name = "Charge Bar Background";

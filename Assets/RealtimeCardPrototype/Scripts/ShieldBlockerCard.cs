@@ -5,6 +5,7 @@ namespace RealtimeCardPrototype
     public sealed class ShieldBlockerCard : FieldStructureCard
     {
         private EnemyAttackSequence sequence;
+        private CardCombatEffects ward;
         private bool isReturnPending;
         private float returnDeadline;
 
@@ -31,9 +32,12 @@ namespace RealtimeCardPrototype
             return sequence != null && sequence.TryAppendBlock(this, nextBlock);
         }
 
-        internal float AbsorbEnemyAttack(float damage)
+        internal float AbsorbEnemyAttack(float damage, Vector3 source)
         {
             sequence = null;
+            Vector3 point = TargetPoint;
+            ward.ReleaseWard(AttackProjectile.TravelTime);
+            CardCombatEffects.BlockImpact(point, source - point, AttackProjectile.TravelTime);
             return AbsorbStructureDamage(damage, true);
         }
 
@@ -106,6 +110,8 @@ namespace RealtimeCardPrototype
         private void CommitToAttackSequence()
         {
             isReturnPending = false;
+            CardView view = GetComponent<CardView>();
+            ward = CardCombatEffects.RaiseWard(transform, view.OverlayHeight);
             CommitHandCard();
         }
     }
