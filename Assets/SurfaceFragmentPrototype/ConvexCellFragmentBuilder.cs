@@ -7,9 +7,9 @@ using UnityEngine.Rendering;
 
 namespace SurfaceFragmentPrototype
 {
-    internal static class CellFragmentBuilder
+    public static class CellFragmentBuilder
     {
-        internal sealed class Result
+        public sealed class Result
         {
             public Mesh mesh;
             public List<Vector3> centers;

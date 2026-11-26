@@ -19,8 +19,10 @@ namespace RealtimeCardPrototype
         private readonly Renderer[] powerOutlineRenderers = new Renderer[4];
         private Renderer[] modelRenderers;
         private CardMotionEffects motionEffects;
+        private CardFaceLabels faceLabels;
         private Color baseBodyColor = Color.white;
         private Color baseTextColor = Color.white;
+        private int displayedPowerStacks;
 
         public CardTeam Team => team;
         public Rigidbody Body { get; private set; }
@@ -77,6 +79,7 @@ namespace RealtimeCardPrototype
             if (modelRenderers != null)
             {
                 SetModelAvailability(isAvailable);
+                faceLabels.SetAvailable(isAvailable);
             }
 
             if (titleText != null)
@@ -98,12 +101,18 @@ namespace RealtimeCardPrototype
             modelScale.x *= size.x / colliderSize.x;
             modelScale.z *= size.y / colliderSize.z;
             model.localScale = modelScale;
+            // The turret's imported mesh has its mana badge on the opposite end.
+            float modelForward = Kind == CardKind.Turret ? -1f : 1f;
+            if (modelForward < 0f)
+            {
+                model.Rotate(0f, 180f, 0f, Space.Self);
+            }
+
             Collider.size = new Vector3(size.x, colliderSize.y, size.y);
             modelRenderers = model.GetComponentsInChildren<Renderer>();
 
-            titleText = CreateText("Title", transform, new Vector3(0f, overlayHeight, size.y * 0.33f), 0.073f, FontStyle.Bold);
-            bodyText = CreateText("BodyText", transform, new Vector3(0f, overlayHeight, -size.y * 0.25f), 0.043f, FontStyle.Normal);
-            Configure(CardTeam.Player, definition.Title, definition.Body, definition.Color, Color.white);
+            faceLabels = new CardFaceLabels(transform, model, definition, modelForward);
+            team = CardTeam.Player;
             CreatePowerOutline(size);
             switch (Kind)
             {
@@ -111,6 +120,12 @@ namespace RealtimeCardPrototype
                 case CardKind.Heavy:
                 case CardKind.Blast:
                 case CardKind.Block:
+                case CardKind.Shock:
+                case CardKind.Poison:
+                case CardKind.Focus:
+                case CardKind.Turret:
+                case CardKind.Pierce:
+                case CardKind.Power:
                     motionEffects = gameObject.AddComponent<CardMotionEffects>();
                     motionEffects.Configure(Kind, GetComponent<IHandCard>(), size.x, overlayHeight);
                     break;
@@ -118,6 +133,11 @@ namespace RealtimeCardPrototype
                     AddMotionTrail(gameObject, definition.Color);
                     break;
             }
+        }
+
+        internal void SetEffectLabelVisible(bool visible)
+        {
+            faceLabels.SetEffectVisible(visible);
         }
 
         internal void ReleaseMotionEffects()
@@ -180,6 +200,13 @@ namespace RealtimeCardPrototype
                     }
                 }
             }
+
+            if (stacks > displayedPowerStacks)
+            {
+                CardCombatEffects.ConfirmPower(this, color);
+            }
+
+            displayedPowerStacks = stacks;
         }
 
         public static CardView Create(string name, Vector3 position, Vector2 size, Color color, CardTeam team)

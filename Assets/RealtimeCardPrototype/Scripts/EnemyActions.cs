@@ -60,7 +60,7 @@ namespace RealtimeCardPrototype
     public sealed class EnemyAttackAction : IEnemyAction
     {
         private readonly float chargeSeconds;
-        private readonly float damage;
+        private readonly int damage;
         private readonly EnemyAttackTargetMode targetMode;
         private readonly int hitCount;
         private readonly float hitInterval;
@@ -73,7 +73,7 @@ namespace RealtimeCardPrototype
         public EnemyAttackAction(float chargeSeconds, float damage, EnemyAttackTargetMode targetMode, int hitCount, float hitInterval)
         {
             this.chargeSeconds = Mathf.Max(0.01f, chargeSeconds);
-            this.damage = Mathf.Max(0f, damage);
+            this.damage = CombatDamage.ToHitPoints(damage);
             this.targetMode = targetMode;
             this.hitCount = Mathf.Max(1, hitCount);
             this.hitInterval = Mathf.Max(0.01f, hitInterval);

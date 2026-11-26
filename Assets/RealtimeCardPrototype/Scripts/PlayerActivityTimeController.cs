@@ -9,12 +9,15 @@ namespace RealtimeCardPrototype
     {
         [SerializeField] private float idleTimeScale = 0.22f;
         [SerializeField] private float cardInteractionTimeScale = 1f;
+        [SerializeField, Min(0f), Tooltip("Real seconds to hold interaction speed after using a card.")]
+        private float postCardUseDelay = 0.2f;
         [SerializeField] private float speedUpSharpness = 18f;
         [SerializeField] private float slowDownSharpness = 5.5f;
         [SerializeField] private Color slowTimeOverlayColor = new Color(0.36f, 0.38f, 0.4f, 0.22f);
 
         private static readonly HashSet<int> ActiveCardSources = new HashSet<int>();
         private static readonly HashSet<int> PauseSources = new HashSet<int>();
+        private static double lastCardUseTime;
 
         private Image overlayImage;
         private Text focusModeText;
@@ -26,6 +29,7 @@ namespace RealtimeCardPrototype
         {
             ActiveCardSources.Clear();
             PauseSources.Clear();
+            lastCardUseTime = double.NegativeInfinity;
             baseFixedDeltaTime = Time.fixedDeltaTime;
             currentTimeScale = Mathf.Clamp(Time.timeScale, idleTimeScale, cardInteractionTimeScale);
             CreateOverlay();
@@ -46,8 +50,16 @@ namespace RealtimeCardPrototype
                 return;
             }
 
-            float sharpness = targetTimeScale > currentTimeScale ? speedUpSharpness : slowDownSharpness;
-            currentTimeScale = Mathf.Lerp(currentTimeScale, targetTimeScale, 1f - Mathf.Exp(-sharpness * unscaledDeltaTime));
+            if (Time.unscaledTimeAsDouble - lastCardUseTime < postCardUseDelay)
+            {
+                currentTimeScale = cardInteractionTimeScale;
+            }
+            else
+            {
+                float sharpness = targetTimeScale > currentTimeScale ? speedUpSharpness : slowDownSharpness;
+                currentTimeScale = Mathf.Lerp(currentTimeScale, targetTimeScale, 1f - Mathf.Exp(-sharpness * unscaledDeltaTime));
+            }
+
             ApplyTimeScale(currentTimeScale);
             UpdateOverlay();
             UpdateFocusModeText();
@@ -79,6 +91,11 @@ namespace RealtimeCardPrototype
             {
                 ActiveCardSources.Remove(id);
             }
+        }
+
+        internal static void ReportCardUse()
+        {
+            lastCardUseTime = Time.unscaledTimeAsDouble;
         }
 
         public static void ReportPause(Object source, bool isPaused)

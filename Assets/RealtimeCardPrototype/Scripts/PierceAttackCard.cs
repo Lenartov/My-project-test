@@ -204,13 +204,18 @@ namespace RealtimeCardPrototype
 
                 UpdateChargeBar();
                 LeftHand?.Invoke(this);
+                CardCombatEffects.ArmPierce(cardView, activeLifetime);
             }
 
             enemiesInside.Add(enemy);
             Vector3 contactPoint = other.ClosestPoint(transform.position);
             CardHitProfile boostedProfile = hitProfile;
             boostedProfile.damage *= PowerMultiplier;
-            enemy.ReceiveHit(boostedProfile, lastPosition, hitVelocity, contactPoint);
+            DamageResult hit = enemy.ReceiveHit(boostedProfile, lastPosition, hitVelocity, contactPoint);
+            if (hit.Damage > 0f)
+            {
+                CardCombatEffects.PiercePass(contactPoint, hitVelocity);
+            }
         }
 
         private void OnTriggerExit(Collider other)

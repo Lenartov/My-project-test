@@ -21,6 +21,8 @@ namespace RealtimeCardPrototype
         private EnemyMovementController movementController;
         private EnemyStatusEffects statusEffects;
         private EnemyCardStatusView statusView;
+        private CardCombatEffects shockMark;
+        private CardCombatEffects poisonMark;
         private float deathTimer;
         private bool isDying;
         private EnemyActionController actionController;
@@ -97,6 +99,18 @@ namespace RealtimeCardPrototype
             }
 
             statusEffects.Tick(Time.deltaTime, Time.time, ReceivePoisonDamage, ShowAccumulatedShockDamage);
+            if (shockMark != null && !statusEffects.HasShockMark)
+            {
+                Destroy(shockMark.gameObject);
+                shockMark = null;
+            }
+
+            if (poisonMark != null && statusEffects.PoisonLevel == 0)
+            {
+                Destroy(poisonMark.gameObject);
+                poisonMark = null;
+            }
+
             sideState.Tick(Time.deltaTime);
             TickAttackSequences(Time.deltaTime);
             actionController.Tick(this, Time.deltaTime);
@@ -170,7 +184,6 @@ namespace RealtimeCardPrototype
             float facingMultiplier = GetSideMultiplier(hitRole);
             float speedMultiplier = profile.GetSpeedMultiplier(speed);
             float totalMultiplier = facingMultiplier * speedMultiplier;
-            float damage = profile.damage * totalMultiplier;
             float postureDamage = profile.postureDamage * totalMultiplier;
 
             Vector3 impulseDirection = attackerVelocity.sqrMagnitude > 0.01f
@@ -179,9 +192,9 @@ namespace RealtimeCardPrototype
             impulseDirection.y = 0f;
 
             string facingLabel = GetRoleLabel(hitRole);
-            ApplyDamage(new EnemyDamageEvent(
+            int damage = ApplyDamage(new EnemyDamageEvent(
                 EnemyDamageKind.Direct,
-                damage,
+                profile.damage * totalMultiplier,
                 postureDamage,
                 true,
                 true,
@@ -191,7 +204,7 @@ namespace RealtimeCardPrototype
                 Vector3.zero,
                 new Color(1f, 0.12f, 0.08f),
                 facingLabel));
-            Debug.Log($"{name} hit: {hitSide} {facingLabel}, damage {damage:0.0}, balance {balanceState.CurrentBalance:0.0}/{balanceState.MaxBalance:0.0}, speed {speed:0.0}");
+            Debug.Log($"{name} hit: {hitSide} {facingLabel}, damage {damage}, balance {balanceState.CurrentBalance:0.0}/{balanceState.MaxBalance:0.0}, speed {speed:0.0}");
             return new DamageResult(damage, postureDamage);
         }
 
@@ -204,7 +217,7 @@ namespace RealtimeCardPrototype
 
             Vector3 impulseDirection = transform.position - blastPoint;
             impulseDirection.y = 0f;
-            ApplyDamage(new EnemyDamageEvent(
+            int appliedDamage = ApplyDamage(new EnemyDamageEvent(
                 EnemyDamageKind.Splash,
                 damage,
                 postureDamage,
@@ -216,7 +229,7 @@ namespace RealtimeCardPrototype
                 Vector3.right * 0.18f,
                 new Color(1f, 0.44f, 0.12f),
                 "SPLASH"));
-            Debug.Log($"{name} splash hit: damage {damage:0.0}, balance {balanceState.CurrentBalance:0.0}/{balanceState.MaxBalance:0.0}");
+            Debug.Log($"{name} splash hit: damage {appliedDamage}, balance {balanceState.CurrentBalance:0.0}/{balanceState.MaxBalance:0.0}");
         }
 
         public void ApplyGravitonPull(Vector3 center, float acceleration)
@@ -274,6 +287,11 @@ namespace RealtimeCardPrototype
             }
 
             statusEffects.ApplyPoisonHover(deltaTime, damageMultiplier, Time.time);
+            if (poisonMark == null && statusEffects.PoisonLevel > 0)
+            {
+                Vector3 point = transform.TransformPoint(new Vector3(-cardView.Collider.size.x * 0.46f, 0.20f, 0f));
+                poisonMark = CardCombatEffects.MarkPoison(transform, point);
+            }
         }
 
         public void ApplyShockMark()
@@ -284,6 +302,9 @@ namespace RealtimeCardPrototype
             }
 
             statusEffects.ApplyShockMark();
+            Vector3 point = transform.TransformPoint(new Vector3(cardView.Collider.size.x * 0.43f, 0.23f, 0.23f));
+            shockMark = CardCombatEffects.MarkShock(
+                transform, point, statusEffects.ShockDuration, configuration.statusEffects.shockChainRadius, shockMark);
             RefreshStatus($"SHOCK\nHP {healthState.CurrentHealth:0}");
         }
 
@@ -305,9 +326,14 @@ namespace RealtimeCardPrototype
             RefreshStatusView();
         }
 
-        public EnemyAttackPlan CreateEnemyAttackPlan(EnemyAttackTargetMode mode, int hitCount, float hitInterval, float damage)
+        public EnemyAttackPlan CreateEnemyAttackPlan(EnemyAttackTargetMode mode, int hitCount, float hitInterval, int damage)
         {
-            EnemyAttackPlan plan = attackExecutor.CreatePlan(mode, hitCount == 1 && damage > 0f);
+            if (damage <= 0)
+            {
+                return default;
+            }
+
+            EnemyAttackPlan plan = attackExecutor.CreatePlan(mode, hitCount == 1);
             if (!plan.HasPlayerTarget)
             {
                 return plan;
@@ -318,7 +344,7 @@ namespace RealtimeCardPrototype
             return new EnemyAttackPlan(plan.Mode, null, plan.PlayerTarget, plan.TargetPoint, sequence);
         }
 
-        public void ShowEnemyAttackTelegraph(EnemyAttackPlan plan, float damage)
+        public void ShowEnemyAttackTelegraph(EnemyAttackPlan plan, int damage)
         {
             attackExecutor.ShowTelegraph(plan, damage);
         }
@@ -328,7 +354,7 @@ namespace RealtimeCardPrototype
             attackExecutor.HideTelegraph();
         }
 
-        public void ExecuteEnemyAttack(EnemyAttackPlan plan, float damage)
+        public void ExecuteEnemyAttack(EnemyAttackPlan plan, int damage)
         {
             if (plan.Sequence == null)
             {
@@ -348,7 +374,7 @@ namespace RealtimeCardPrototype
             }
         }
 
-        public void ExecuteEnemyAttackHit(EnemyAttackPlan plan, int hitIndex, List<ShieldBlockerCard> blockChain, float damage)
+        public void ExecuteEnemyAttackHit(EnemyAttackPlan plan, int hitIndex, List<ShieldBlockerCard> blockChain, int damage)
         {
             attackExecutor.ExecuteBlockChain(plan, hitIndex, blockChain, damage);
         }
@@ -360,7 +386,7 @@ namespace RealtimeCardPrototype
 
         public void PerformBasicEnemyAttack(float damage)
         {
-            attackExecutor.Execute(attackExecutor.CreatePlan(EnemyAttackTargetMode.Structure), damage);
+            attackExecutor.Execute(attackExecutor.CreatePlan(EnemyAttackTargetMode.Structure), CombatDamage.ToHitPoints(damage));
         }
 
         private void AddBalanceFromDamage(float damage, bool canTriggerBreak)
@@ -376,35 +402,36 @@ namespace RealtimeCardPrototype
             }
         }
 
-        private void ApplyDamage(EnemyDamageEvent damageEvent)
+        private int ApplyDamage(EnemyDamageEvent damageEvent)
         {
-            if (isDying || damageEvent.Damage <= 0f)
+            int damage = damageEvent.Damage;
+            if (isDying || damage <= 0)
             {
-                return;
+                return 0;
             }
 
-            healthState.ApplyDamage(damageEvent.Damage);
-            DamageWindowTracker.Record(damageEvent.Damage);
-            AddBalanceFromDamage(damageEvent.Damage, damageEvent.CanTriggerBalanceBreak);
+            healthState.ApplyDamage(damage);
+            DamageWindowTracker.Record(damage);
+            AddBalanceFromDamage(damage, damageEvent.CanTriggerBalanceBreak);
 
             if (damageEvent.ApplyKnockback)
             {
-                movementController.ApplyDamageKnockback(damageEvent.Damage, damageEvent.KnockbackDirection);
+                movementController.ApplyDamageKnockback(damage, damageEvent.KnockbackDirection);
             }
 
             if (damageEvent.ShowPopup)
             {
-                string format = damageEvent.Kind == EnemyDamageKind.TurretShot ? "0.##" : "0";
-                DamagePopup.Spawn(damageEvent.Damage, transform.position + damageEvent.PopupOffset, damageEvent.PopupColor, format);
+                DamagePopup.Spawn(damage, transform.position + damageEvent.PopupOffset, damageEvent.PopupColor);
             }
 
             if (damageEvent.TriggerShockChain)
             {
-                TriggerShockChain(damageEvent.Damage);
+                TriggerShockChain(damage);
             }
 
             RefreshStatus($"{damageEvent.StatusLabel}\nHP {healthState.CurrentHealth:0}");
             TryStartDeath();
+            return damage;
         }
 
         private void StartBalanceBreak()
@@ -419,19 +446,9 @@ namespace RealtimeCardPrototype
         }
 
 
-        private void ApplyShockChainDamage(float damage, bool showImmediatePopup)
+        private int ApplyShockChainDamage(float damage, bool showImmediatePopup)
         {
-            if (isDying || damage <= 0f)
-            {
-                return;
-            }
-
-            if (!showImmediatePopup)
-            {
-                statusEffects.AccumulateShockPopup(damage);
-            }
-
-            ApplyDamage(new EnemyDamageEvent(
+            int appliedDamage = ApplyDamage(new EnemyDamageEvent(
                 EnemyDamageKind.ShockChain,
                 damage,
                 0f,
@@ -443,16 +460,23 @@ namespace RealtimeCardPrototype
                 Vector3.left * 0.18f,
                 new Color(0.18f, 0.58f, 1f),
                 "CHAIN"));
+
+            if (!showImmediatePopup)
+            {
+                statusEffects.AccumulateShockPopup(appliedDamage);
+            }
+
+            return appliedDamage;
         }
 
-        private void TriggerShockChain(float sourceDamage)
+        private void TriggerShockChain(int sourceDamage)
         {
             TriggerShockChain(sourceDamage, true);
         }
 
-        private void TriggerShockChain(float sourceDamage, bool showImmediatePopup)
+        private void TriggerShockChain(int sourceDamage, bool showImmediatePopup)
         {
-            if (!statusEffects.HasShockMark || sourceDamage <= 0f)
+            if (!statusEffects.HasShockMark || sourceDamage <= 0)
             {
                 return;
             }
@@ -460,6 +484,7 @@ namespace RealtimeCardPrototype
             float chainDamage = statusEffects.GetShockChainDamage(sourceDamage);
             int hitCount = Physics.OverlapSphereNonAlloc(transform.position, configuration.statusEffects.shockChainRadius, ShockHits);
             HashSet<EnemyDummyCard> chainedEnemies = new HashSet<EnemyDummyCard>();
+            bool hasChain = false;
 
             for (int i = 0; i < hitCount; i++)
             {
@@ -470,13 +495,23 @@ namespace RealtimeCardPrototype
                 }
 
                 chainedEnemies.Add(enemy);
-                enemy.ApplyShockChainDamage(chainDamage, showImmediatePopup);
+                Vector3 position = enemy.transform.position;
+                if (enemy.ApplyShockChainDamage(chainDamage, showImmediatePopup) > 0)
+                {
+                    CardCombatEffects.ShockArc(transform.position, position);
+                    hasChain = true;
+                }
+            }
+
+            if (hasChain)
+            {
+                CardCombatAudio.PlayShockChain();
             }
         }
 
         private void ReceivePoisonDamage(float damage)
         {
-            ApplyDamage(new EnemyDamageEvent(
+            int appliedDamage = ApplyDamage(new EnemyDamageEvent(
                 EnemyDamageKind.Poison,
                 damage,
                 0f,
@@ -488,9 +523,14 @@ namespace RealtimeCardPrototype
                 Vector3.right * 0.18f,
                 new Color(0.74f, 0.96f, 0.08f),
                 "POISON"));
+
+            if (appliedDamage > 0)
+            {
+                CardCombatEffects.PoisonTick(transform.position - Vector3.right * 0.34f);
+            }
         }
 
-        private void ShowAccumulatedShockDamage(float damage)
+        private void ShowAccumulatedShockDamage(int damage)
         {
             DamagePopup.Spawn(damage, transform.position + Vector3.left * 0.18f, new Color(0.18f, 0.58f, 1f));
         }
@@ -503,6 +543,17 @@ namespace RealtimeCardPrototype
             }
 
             isDying = true;
+            if (shockMark != null)
+            {
+                Destroy(shockMark.gameObject);
+            }
+
+            if (poisonMark != null)
+            {
+                Destroy(poisonMark.gameObject);
+                poisonMark = null;
+            }
+
             deathTimer = 0f;
             body.linearVelocity = Vector3.zero;
             body.angularVelocity = Vector3.zero;

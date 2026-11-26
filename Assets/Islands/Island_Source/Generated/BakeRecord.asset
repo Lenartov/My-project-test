@@ -1,0 +1,104 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4a77fd529c968a4ea5afbf8c9a858cd, type: 3}
+  m_Name: BakeRecord
+  m_EditorClassIdentifier: 
+  sourceKey: GlobalObjectId_V1-1-7c3fb897b3944c06aff671e3035dbfe9-100000-0
+  sourceGuid: 7c3fb897b3944c06aff671e3035dbfe9
+  outputFolder: Assets/Islands/Island_Source/Generated
+  generatedPrefab: {fileID: 100000, guid: 3cc2590c837a4cd3a085cdd57b59f177, type: 3}
+  geometry:
+  - key: 432580a8dfec41e2aaa2c0b1f38c08ae:4300000
+    mesh: {fileID: 4300000, guid: 03b512886fcf4ebfa0d51df4803d9ae4, type: 2}
+    data: {fileID: 11400000, guid: ae55a060c60f4cc4a42b2092f0690d95, type: 2}
+  - key: 7526a719a8884ed98e044f113f35b15e:4300000
+    mesh: {fileID: 4300000, guid: 6c2a237f5c1c4c6294eb207709240833, type: 2}
+    data: {fileID: 11400000, guid: 5ad8dfd7822c4d2bb4149a595cacdd41, type: 2}
+  - key: d35ffe92aa0c4d9892ff8d231231608c:4300000
+    mesh: {fileID: 4300000, guid: 9bbe29bd42e14c79bfef6d9e42026e83, type: 2}
+    data: {fileID: 11400000, guid: 2441c09bb6924116a156f394baf4e9d1, type: 2}
+  - key: 2c78350fd027415599299f4ea18b42b8:4300000
+    mesh: {fileID: 4300000, guid: 184c7786a66c4abb83e8e3c72754feec, type: 2}
+    data: {fileID: 11400000, guid: 31aa3c1f095044d7a25e6c18cbcb701f, type: 2}
+  - key: 5ce77d11ea9345388c48d14fc4fed1ed:4300000
+    mesh: {fileID: 4300000, guid: 4c9b8f3e3d464b34aea13cf1797d3409, type: 2}
+    data: {fileID: 11400000, guid: 33ce6eb9d4bc47669b6dc424ef7f4e4d, type: 2}
+  - key: 3867186597d34d7d971041da649c0f98:4300000
+    mesh: {fileID: 4300000, guid: 0756bd2d69e34df69d9878825499357b, type: 2}
+    data: {fileID: 11400000, guid: 54d0d77a340b47b6a3fa9c2c1af56a59, type: 2}
+  materials:
+  - key: 90009d34d069459c91be5afb3cc23306:2100000
+    material: {fileID: 2100000, guid: 172c031b53104f99bfb9e20a535a2f4d, type: 2}
+  - key: 603d9474ba274e779c98a68a2238e034:2100000
+    material: {fileID: 2100000, guid: 459cc2705af248a69fa5fe0b16a80bf7, type: 2}
+  - key: a05db99f53474b01a0d0abf415b09726:2100000
+    material: {fileID: 2100000, guid: 6b57a1d2e2074d77a2fe8b104105bc86, type: 2}
+  - key: 7b602f0ed2184f188121bb464959ad79:2100000
+    material: {fileID: 2100000, guid: a17b7a4f39a740fda2fc57b2eb89425c, type: 2}
+  - key: d4311d2d4dfb48c1838e42d1b399f310:2100000
+    material: {fileID: 2100000, guid: 5309b1d7ac7c40a692707cb20a9d2583, type: 2}
+  - key: 317e74d25be1432290e31cd0e2439731:2100000
+    material: {fileID: 2100000, guid: 869eaae3338348d287c92b8e4c702b33, type: 2}
+  - key: 9de9dcb026dd45a8b74098e92b6b02ea:2100000
+    material: {fileID: 2100000, guid: b49fc44d790c4e18b64eaf94c6c63e0c, type: 2}
+  - key: 2e6037b4928d4b1f962ba325a712b9ea:2100000
+    material: {fileID: 2100000, guid: 0c58e1d1e8054f76a3facd031e35df1d, type: 2}
+  - key: 8cdda61413a644f6bb35e9082b4bb342:2100000
+    material: {fileID: 2100000, guid: ba7daac5613a42e49c50255e9ea9fb5f, type: 2}
+  - key: 893882ac7afa4d0f8cabdd3c2c076dbe:2100000
+    material: {fileID: 2100000, guid: 1dce027a1ad645deb606a489e2ca7b05, type: 2}
+  - key: 0a85f6d0b8d441cfacd6ed2d29db8e69:2100000
+    material: {fileID: 2100000, guid: 48233f2c3a544d0c981d85679d0dc738, type: 2}
+  - key: fd5f1e7575074d0caf3ad49fc3f38ef1:2100000
+    material: {fileID: 2100000, guid: b79c12b1e7f146dd82c4e0fdc105e4b0, type: 2}
+  - key: e019e6de97d847b688aec8d83f06c8db:2100000
+    material: {fileID: 2100000, guid: 4348f8c336a64b2e9b1b3f1ee63d1e37, type: 2}
+  - key: 9a3a824da9f04246aff7335de750f519:2100000
+    material: {fileID: 2100000, guid: 7b585cd85c1f4e93bdd3cc31ebb3db75, type: 2}
+  - key: 1415512936eb4078a40671ce9a83fa41:2100000
+    material: {fileID: 2100000, guid: b4d962ae09a94f2e8e43a54f4a7470e9, type: 2}
+  - key: ab642a651ef64df298adf1ae61f26ea0:2100000
+    material: {fileID: 2100000, guid: ac7e7cdbcca34c2d8440a2d88ca785fe, type: 2}
+  - key: 74b00a0a160e45e7ab6d4444ada5184d:2100000
+    material: {fileID: 2100000, guid: 0055bbafff6f447cb3add21a96e00714, type: 2}
+  - key: 2e672704ad6247b59103033b5950f77a:2100000
+    material: {fileID: 2100000, guid: 640aabf2e39d4467b5965cad0ddd76f4, type: 2}
+  - key: 4a91affdb06249d59334a75bbe0d9e38:2100000
+    material: {fileID: 2100000, guid: cdfdc1119d8a4036bd3d407fb74673a0, type: 2}
+  - key: 05d9236d56234077b838ccc43c65280e:2100000
+    material: {fileID: 2100000, guid: 65a26d1569174730acd32cc9c945965c, type: 2}
+  - key: 318bd5dc664b476695c1e855cbeac480:2100000
+    material: {fileID: 2100000, guid: 848df26f94f84bea94557d0afc513d8e, type: 2}
+  - key: e9b2fc9d3cc846cba7e08f167cadc5e5:2100000
+    material: {fileID: 2100000, guid: 553100b02db14c79b7da5393c764ea10, type: 2}
+  - key: a53419092d9e4a5cb9b1a1b5858c82c3:2100000
+    material: {fileID: 2100000, guid: 6b562672b6ff4a259902f88ca7988340, type: 2}
+  - key: 10b43afa84134cb792d68743011e6584:2100000
+    material: {fileID: 2100000, guid: 2174b8375f5d40f186429df4c2b16ad2, type: 2}
+  - key: 0c47643425854b159dfaed0b00e10898:2100000
+    material: {fileID: 2100000, guid: 740ecd2a150e4fdbb33b2a25758866c4, type: 2}
+  - key: 36c3e7b8d48343a9bf65bb7773879a15:2100000
+    material: {fileID: 2100000, guid: c76c273a404b49be96783b61e71ecef7, type: 2}
+  - key: ff28174d73c347208d976845e76cee56:2100000
+    material: {fileID: 2100000, guid: dd342a07ffbc47c0ae73dfe2db382758, type: 2}
+  - key: 91736483afe2464d9e9a2ae37f5ad78e:2100000
+    material: {fileID: 2100000, guid: 7284f3fd101349479b274d3083dd9ef4, type: 2}
+  - key: 1766e59343a14b9fb0247d0701edf5f8:2100000
+    material: {fileID: 2100000, guid: 45dbb3960e97473385125ff3f7d67bee, type: 2}
+  - key: f31acec7fa5042448284abb5882838ca:2100000
+    material: {fileID: 2100000, guid: f08b9256a0244046a093bf39d0c54c4c, type: 2}
+  - key: 3256fd4f0e4e40eb8a75b4c03c28acf4:2100000
+    material: {fileID: 2100000, guid: 1652d607d1374296ab2a581d5ffcc55b, type: 2}
+  - key: f18cc674daa84c1b92aef79a506a71b5:2100000
+    material: {fileID: 2100000, guid: fa898a622e4a4d069eb8d168afea67ec, type: 2}
+  - key: 501a026cf6a0467b9204e479d1828403:2100000
+    material: {fileID: 2100000, guid: 57f3b973f37844e8977abc36ffd1f1b9, type: 2}

@@ -10,6 +10,16 @@ namespace RealtimeCardPrototype
         protected override int DefaultManaCost => 3;
         protected override Color HealthBarFillColor => new Color(1f, 0.72f, 0.08f);
 
+        protected override void OnMouseUp()
+        {
+            bool wasDragging = IsDragging;
+            base.OnMouseUp();
+            if (wasDragging)
+            {
+                CardCombatEffects.PlacePower(GetComponent<CardView>());
+            }
+        }
+
         private void OnTriggerEnter(Collider other)
         {
             if (!IsActiveOnField)

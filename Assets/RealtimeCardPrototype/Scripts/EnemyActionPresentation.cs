@@ -314,7 +314,7 @@ namespace RealtimeCardPrototype
         private float age;
         internal const float TravelTime = 0.3f;
 
-        public static void Spawn(Vector3 start, Vector3 end, float damage)
+        public static void Spawn(Vector3 start, Vector3 end, int damage)
         {
             AttackProjectile projectile = Create(start, end, new Color(1f, 0.02f, 0.01f));
             projectile.damageText = CreateDamageText(projectile.transform, damage);
@@ -384,13 +384,13 @@ namespace RealtimeCardPrototype
             }
         }
 
-        private static TextMesh CreateDamageText(Transform parent, float damage)
+        private static TextMesh CreateDamageText(Transform parent, int damage)
         {
             GameObject textObject = new GameObject("Attack Damage");
             textObject.transform.SetParent(parent, false);
 
             TextMesh text = textObject.AddComponent<TextMesh>();
-            text.text = damage.ToString("0");
+            text.text = damage.ToString();
             text.anchor = TextAnchor.MiddleCenter;
             text.alignment = TextAlignment.Center;
             text.characterSize = 0.1f;

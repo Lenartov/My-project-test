@@ -137,8 +137,14 @@ namespace RealtimeCardPrototype
             hasBeenPlayed = true;
             CardHitProfile boostedProfile = hitProfile;
             boostedProfile.damage *= PowerMultiplier;
-            enemy.ReceiveHit(boostedProfile, lastPosition, smoothedVelocity, contact.point);
+            DamageResult hit = enemy.ReceiveHit(boostedProfile, lastPosition, smoothedVelocity, contact.point);
             enemy.ApplyShockMark();
+            if (hit.Damage > 0)
+            {
+                cardView.ReleaseMotionEffects();
+                CardCombatEffects.ShockImpact(contact.point, smoothedVelocity);
+            }
+
             Played?.Invoke(this);
             Destroy(gameObject);
         }

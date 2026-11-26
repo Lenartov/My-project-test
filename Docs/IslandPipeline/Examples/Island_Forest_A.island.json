@@ -1,0 +1,102 @@
+{
+  "format": "fragment_island",
+  "version": 1,
+  "coordinate_space": "unity_y_up_z_forward_meters",
+  "island_id": "Island_Forest_A",
+  "asset_library": "library.assets.json",
+  "bake": {
+    "cell_size": 0.35
+  },
+  "nodes": [
+    {
+      "instance_id": "platform_001",
+      "parent_id": null,
+      "asset_id": "Platform_Forest_Rect_A",
+      "name": "Platform",
+      "position": [0, 0, 0],
+      "rotation": [0, 0, 0, 1],
+      "scale": [1, 1, 1]
+    },
+    {
+      "instance_id": "decor_root",
+      "parent_id": null,
+      "asset_id": null,
+      "name": "Decorations",
+      "position": [0, 0, 0],
+      "rotation": [0, 0, 0, 1],
+      "scale": [1, 1, 1]
+    },
+    {
+      "instance_id": "tree_001",
+      "parent_id": "decor_root",
+      "asset_id": "Tree_Pine_A",
+      "name": "Pine_South",
+      "position": [-2, 0, -3],
+      "rotation": [0, 0, 0, 1],
+      "scale": [1, 1, 1]
+    },
+    {
+      "instance_id": "tree_002",
+      "parent_id": "decor_root",
+      "asset_id": "Tree_Pine_A",
+      "name": "Pine_North",
+      "position": [2, 0, 3],
+      "rotation": [0, 0, 0, 1],
+      "scale": [0.8, 1.1, 0.8]
+    },
+    {
+      "instance_id": "rock_001",
+      "parent_id": "decor_root",
+      "asset_id": "Rock_A",
+      "name": "Rock",
+      "position": [1, 0, -1],
+      "rotation": [0, 1, 0, 0],
+      "scale": [1, 1, 1]
+    }
+  ],
+  "footprint": [[-4, -6], [4, -6], [4, 6], [-4, 6]],
+  "ports": [
+    {
+      "port_id": "WestLower",
+      "position": [-4, 0, -4],
+      "outward_normal": [-1, 0, 0],
+      "width": 6,
+      "boundary": [[-4, 0, -6], [-4, 0, 0]]
+    },
+    {
+      "port_id": "WestUpper",
+      "position": [-4, 0, 4],
+      "outward_normal": [-1, 0, 0],
+      "width": 6,
+      "boundary": [[-4, 0, 0], [-4, 0, 6]]
+    },
+    {
+      "port_id": "EastLower",
+      "position": [4, 0, -4],
+      "outward_normal": [1, 0, 0],
+      "width": 6,
+      "boundary": [[4, 0, -6], [4, 0, 0]]
+    },
+    {
+      "port_id": "EastUpper",
+      "position": [4, 0, 4],
+      "outward_normal": [1, 0, 0],
+      "width": 6,
+      "boundary": [[4, 0, 0], [4, 0, 6]]
+    },
+    {
+      "port_id": "North",
+      "position": [0, 0, 6],
+      "outward_normal": [0, 0, 1],
+      "width": 8,
+      "boundary": []
+    },
+    {
+      "port_id": "South",
+      "position": [0, 0, -6],
+      "outward_normal": [0, 0, -1],
+      "width": 8,
+      "boundary": []
+    }
+  ]
+}

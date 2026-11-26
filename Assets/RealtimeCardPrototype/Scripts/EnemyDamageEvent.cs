@@ -28,7 +28,7 @@ namespace RealtimeCardPrototype
             string statusLabel)
         {
             Kind = kind;
-            Damage = Mathf.Max(0f, damage);
+            Damage = CombatDamage.ToHitPoints(damage);
             PostureDamage = Mathf.Max(0f, postureDamage);
             CanTriggerBalanceBreak = canTriggerBalanceBreak;
             ApplyKnockback = applyKnockback;
@@ -41,7 +41,7 @@ namespace RealtimeCardPrototype
         }
 
         public EnemyDamageKind Kind { get; }
-        public float Damage { get; }
+        public int Damage { get; }
         public float PostureDamage { get; }
         public bool CanTriggerBalanceBreak { get; }
         public bool ApplyKnockback { get; }

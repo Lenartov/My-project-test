@@ -9,6 +9,7 @@ namespace RealtimeCardPrototype
         [SerializeField] private float riseSpeed = 0.85f;
         [SerializeField] private float fadeDelay = 0.12f;
 
+        private static readonly System.Random SpawnRandom = new System.Random();
         private TextMesh textMesh;
         private Camera mainCamera;
         private Color startColor;
@@ -23,8 +24,9 @@ namespace RealtimeCardPrototype
 
         private void Update()
         {
-            age += Time.deltaTime;
-            transform.position += Vector3.up * (riseSpeed * Time.deltaTime);
+            float deltaTime = Time.unscaledDeltaTime;
+            age += deltaTime;
+            transform.position += Vector3.up * (riseSpeed * deltaTime);
 
             if (mainCamera != null)
             {
@@ -44,32 +46,34 @@ namespace RealtimeCardPrototype
             }
         }
 
-        public static void Spawn(float damage, Vector3 position)
+        public static void Spawn(int damage, Vector3 position, Color color)
         {
-            Spawn(damage, position, new Color(1f, 0.12f, 0.08f));
-        }
-
-        public static void Spawn(float damage, Vector3 position, Color color, string format = "0")
-        {
-            Spawn("-" + damage.ToString(format), position, color);
+            if (damage > 0)
+            {
+                Spawn($"-{damage}", position, color);
+            }
         }
 
         public static void SpawnHealing(float amount, Vector3 position, Color color)
         {
-            Spawn($"+{amount:0}", position, color);
+            Spawn($"+{CombatDamage.ToHitPoints(amount)}", position, color);
         }
 
         private static void Spawn(string textValue, Vector3 position, Color color)
         {
             GameObject popup = new GameObject("Damage Popup");
-            popup.transform.position = position + Vector3.up * 0.65f;
+            Vector3 offset = new Vector3(
+                (float)SpawnRandom.NextDouble() * 0.44f - 0.22f,
+                0.60f + (float)SpawnRandom.NextDouble() * 0.10f,
+                (float)SpawnRandom.NextDouble() * 0.28f - 0.14f);
+            popup.transform.position = position + offset;
             popup.transform.rotation = Quaternion.Euler(55f, 0f, 0f);
 
             TextMesh text = popup.AddComponent<TextMesh>();
             text.text = textValue;
             text.anchor = TextAnchor.MiddleCenter;
             text.alignment = TextAlignment.Center;
-            text.characterSize = 0.16f;
+            text.characterSize = 0.08f;
             text.fontSize = 64;
             text.fontStyle = FontStyle.Bold;
             text.color = color;
@@ -82,10 +86,10 @@ namespace RealtimeCardPrototype
 
     public readonly struct DamageResult
     {
-        public readonly float Damage;
+        public readonly int Damage;
         public readonly float PostureDamage;
 
-        public DamageResult(float damage, float postureDamage)
+        public DamageResult(int damage, float postureDamage)
         {
             Damage = damage;
             PostureDamage = postureDamage;
@@ -97,12 +101,12 @@ namespace RealtimeCardPrototype
         private struct DamageSample
         {
             public float Time;
-            public float Amount;
+            public int Amount;
         }
 
         private static readonly Queue<DamageSample> samples = new Queue<DamageSample>();
 
-        public static void Record(float amount)
+        public static void Record(int amount)
         {
             if (amount > 0f)
             {
@@ -110,7 +114,7 @@ namespace RealtimeCardPrototype
             }
         }
 
-        public static float GetRecentDamage(float windowSeconds)
+        public static int GetRecentDamage(float windowSeconds)
         {
             float cutoff = Time.time - Mathf.Max(0f, windowSeconds);
             while (samples.Count > 0 && samples.Peek().Time < cutoff)
@@ -118,7 +122,7 @@ namespace RealtimeCardPrototype
                 samples.Dequeue();
             }
 
-            float total = 0f;
+            int total = 0;
             foreach (DamageSample sample in samples)
             {
                 total += sample.Amount;

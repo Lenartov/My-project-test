@@ -69,8 +69,8 @@ namespace RealtimeCardPrototype
         {
             if (damageWindowText != null)
             {
-                float damage = DamageWindowTracker.GetRecentDamage(windowSeconds);
-                damageWindowText.text = $"DMG {windowSeconds:0}s\n{damage:0.0}";
+                int damage = DamageWindowTracker.GetRecentDamage(windowSeconds);
+                damageWindowText.text = $"DMG {windowSeconds:0}s\n{damage}";
             }
         }
 

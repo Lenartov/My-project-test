@@ -37,6 +37,11 @@ namespace RealtimeCardPrototype
             camera.fieldOfView = settings.FieldOfView;
             camera.clearFlags = CameraClearFlags.SolidColor;
             camera.backgroundColor = settings.BackgroundColor;
+            if (!camera.TryGetComponent(out AudioListener _))
+            {
+                camera.gameObject.AddComponent<AudioListener>();
+            }
+
             return camera;
         }
 

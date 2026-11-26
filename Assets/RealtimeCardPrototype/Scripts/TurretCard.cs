@@ -6,6 +6,7 @@ namespace RealtimeCardPrototype
     public sealed class TurretCard : FieldStructureCard, IPowerBoostTarget
     {
         internal const int Cost = 2;
+        private const int BaseShotDamage = 1;
         private const int MaxPowerStacks = 3;
         private const float PowerPerStack = 0.5f;
         private static readonly Color ShotColor = new Color(0.18f, 1f, 0.74f);
@@ -20,7 +21,7 @@ namespace RealtimeCardPrototype
         private float shotTimer;
 
         public override bool CanBeDirectTarget => !IsDragging;
-        protected override float InitialMaxHealth => maxHealth;
+        protected override int InitialMaxHealth => CombatDamage.ToHitPoints(Mathf.Max(1f, maxHealth));
         protected override int DefaultManaCost => Cost;
         protected override Color HealthBarFillColor => ShotColor;
 
@@ -33,6 +34,16 @@ namespace RealtimeCardPrototype
         protected override void OnStructureActivated()
         {
             SetPlayable(true);
+        }
+
+        protected override void OnMouseUp()
+        {
+            bool wasDragging = IsDragging;
+            base.OnMouseUp();
+            if (wasDragging)
+            {
+                CardCombatEffects.PlaceTurret(transform.position, cardView.Collider.size.x * 0.5f);
+            }
         }
 
         protected override void Update()
@@ -53,9 +64,8 @@ namespace RealtimeCardPrototype
             EnemyDummyCard enemy = FindNearestEnemy();
             if (enemy != null)
             {
-                float damage = CardHitProfile.BasicAttack().damage / 3f * (1f + powerSources.Count * PowerPerStack);
-                AttackProjectile.Spawn(transform.position + Vector3.up * cardView.OverlayHeight,
-                    enemy.transform.position + Vector3.up * 0.18f, ShotColor);
+                float damage = BaseShotDamage * (1f + powerSources.Count * PowerPerStack);
+                CardCombatEffects.FireTurret(transform.position + Vector3.up * cardView.OverlayHeight, enemy.transform);
                 enemy.ReceiveTurretShot(damage, ShotColor);
             }
         }

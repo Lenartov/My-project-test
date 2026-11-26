@@ -92,7 +92,7 @@ namespace RealtimeCardPrototype
         public float MaxHealth { get; }
         public float CurrentHealth { get; private set; }
 
-        public bool ApplyDamage(float damage)
+        public bool ApplyDamage(int damage)
         {
             CurrentHealth = Mathf.Max(0f, CurrentHealth - Mathf.Max(0f, damage));
             if (CurrentHealth > 0f)

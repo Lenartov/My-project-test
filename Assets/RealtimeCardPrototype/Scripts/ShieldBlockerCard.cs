@@ -9,7 +9,7 @@ namespace RealtimeCardPrototype
         private bool isReturnPending;
         private float returnDeadline;
 
-        protected override float InitialMaxHealth => 3f;
+        protected override int InitialMaxHealth => 3;
         protected override Color HealthBarFillColor => new Color(0.58f, 0.82f, 1f);
         protected override Color HealthBarBackgroundColor => new Color(0.025f, 0.04f, 0.07f);
         protected override bool ReservesHandSlotUntilCommitted => true;
@@ -32,7 +32,7 @@ namespace RealtimeCardPrototype
             return sequence != null && sequence.TryAppendBlock(this, nextBlock);
         }
 
-        internal float AbsorbEnemyAttack(float damage, Vector3 source)
+        internal int AbsorbEnemyAttack(int damage, Vector3 source)
         {
             sequence = null;
             Vector3 point = TargetPoint;
@@ -41,9 +41,9 @@ namespace RealtimeCardPrototype
             return AbsorbStructureDamage(damage, true);
         }
 
-        internal float GetPreviewOverflowDamage(float damage)
+        internal int GetPreviewOverflowDamage(int damage)
         {
-            return Mathf.Max(0f, damage - CurrentHealth);
+            return Mathf.Max(0, damage - CurrentHealth);
         }
 
         internal void ConsumeUnusedSequenceBlock(EnemyAttackSequence owner)
@@ -110,8 +110,7 @@ namespace RealtimeCardPrototype
         private void CommitToAttackSequence()
         {
             isReturnPending = false;
-            CardView view = GetComponent<CardView>();
-            ward = CardCombatEffects.RaiseWard(transform, view.OverlayHeight);
+            ward = CardCombatEffects.RaiseWard(transform, TargetPoint);
             CommitHandCard();
         }
     }

@@ -5,7 +5,7 @@ namespace RealtimeCardPrototype
 {
     internal readonly struct EnemyAttackTelegraphSegment
     {
-        public EnemyAttackTelegraphSegment(Vector3 start, Vector3 end, float damage, bool startsAtEnemy)
+        public EnemyAttackTelegraphSegment(Vector3 start, Vector3 end, int damage, bool startsAtEnemy)
         {
             Start = start;
             End = end;
@@ -15,7 +15,7 @@ namespace RealtimeCardPrototype
 
         public Vector3 Start { get; }
         public Vector3 End { get; }
-        public float Damage { get; }
+        public int Damage { get; }
         public bool StartsAtEnemy { get; }
     }
 
@@ -25,10 +25,10 @@ namespace RealtimeCardPrototype
         private readonly float hitInterval;
         private int nextHitIndex;
         private float hitTimer;
-        private float damage;
+        private int damage;
         private bool isRunning;
 
-        public EnemyAttackSequence(int hitCount, float hitInterval, float damage)
+        public EnemyAttackSequence(int hitCount, float hitInterval, int damage)
         {
             int clampedHitCount = Mathf.Max(1, hitCount);
             blockChains = new List<ShieldBlockerCard>[clampedHitCount];
@@ -38,7 +38,7 @@ namespace RealtimeCardPrototype
             }
 
             this.hitInterval = Mathf.Max(0.01f, hitInterval);
-            this.damage = Mathf.Max(0f, damage);
+            this.damage = damage;
         }
 
         public int HitCount => blockChains.Length;
@@ -78,7 +78,7 @@ namespace RealtimeCardPrototype
                 List<ShieldBlockerCard> chain = blockChains[i];
                 if (chain.Count == 0
                     || !ReferenceEquals(chain[chain.Count - 1], previousBlock)
-                    || GetRemainingDamage(chain) <= 0f
+                    || GetRemainingDamage(chain) <= 0
                     || !nextBlock.TryAssignToSequence(this))
                 {
                     continue;
@@ -97,9 +97,9 @@ namespace RealtimeCardPrototype
             {
                 List<ShieldBlockerCard> chain = blockChains[hitIndex];
                 Vector3 previousPoint = source;
-                float remainingDamage = damage;
+                int remainingDamage = damage;
 
-                for (int blockIndex = 0; blockIndex < chain.Count && remainingDamage > 0f; blockIndex++)
+                for (int blockIndex = 0; blockIndex < chain.Count && remainingDamage > 0; blockIndex++)
                 {
                     ShieldBlockerCard block = chain[blockIndex];
                     if (block == null || !block.IsTargetable)
@@ -113,7 +113,7 @@ namespace RealtimeCardPrototype
                     remainingDamage = block.GetPreviewOverflowDamage(remainingDamage);
                 }
 
-                if (remainingDamage > 0f)
+                if (remainingDamage > 0)
                 {
                     segments.Add(new EnemyAttackTelegraphSegment(
                         previousPoint,
@@ -135,14 +135,14 @@ namespace RealtimeCardPrototype
             return playerTarget + Vector3.right * offset * 0.28f;
         }
 
-        public void Start(float newDamage, EnemyDummyCard enemy, EnemyAttackPlan plan)
+        public void Start(int newDamage, EnemyDummyCard enemy, EnemyAttackPlan plan)
         {
             if (isRunning)
             {
                 return;
             }
 
-            damage = Mathf.Max(0f, newDamage);
+            damage = newDamage;
             isRunning = true;
             FireNextHit(enemy, plan);
         }
@@ -188,10 +188,10 @@ namespace RealtimeCardPrototype
             enemy.ExecuteEnemyAttackHit(plan, hitIndex, chain, damage);
         }
 
-        private float GetRemainingDamage(List<ShieldBlockerCard> chain)
+        private int GetRemainingDamage(List<ShieldBlockerCard> chain)
         {
-            float remainingDamage = damage;
-            for (int i = 0; i < chain.Count && remainingDamage > 0f; i++)
+            int remainingDamage = damage;
+            for (int i = 0; i < chain.Count && remainingDamage > 0; i++)
             {
                 ShieldBlockerCard block = chain[i];
                 if (block != null && block.IsTargetable)

@@ -19,11 +19,9 @@ namespace RealtimeCardPrototype
             CurrentHealth = MaxHealth;
         }
 
-        public float ApplyDamage(float damage)
+        public void ApplyDamage(int damage)
         {
-            float appliedDamage = Mathf.Max(0f, damage);
-            CurrentHealth = Mathf.Max(0f, CurrentHealth - appliedDamage);
-            return appliedDamage;
+            CurrentHealth = Mathf.Max(0f, CurrentHealth - damage);
         }
 
         public float Restore(float amount)

@@ -113,6 +113,7 @@ namespace RealtimeCardPrototype
         {
             CombatTargetRegistry.SetPlayer(this);
             deck = new CardDeckRuntime(CreateStartingDeck());
+            CardCombatAudio.Initialize(gameObject);
             hudView = new PlayerHudView(transform, HandleAdvanceButtonClicked);
             hudView.Create();
             SpawnInitialHand();
@@ -158,9 +159,15 @@ namespace RealtimeCardPrototype
         {
             card.LeftHand -= HandleCardLeftHand;
             card.Played -= HandleCardPlayed;
+            bool wasInHand = cards.Remove(card);
 
             if (cardDefinitions.TryGetValue(card, out CardDefinition definition))
             {
+                if (wasInHand)
+                {
+                    CardCombatAudio.PlayPlaceholder(definition.Kind);
+                }
+
                 if (definition.Kind == CardKind.Turret)
                 {
                     returningCards.Enqueue(definition);
@@ -173,13 +180,16 @@ namespace RealtimeCardPrototype
                 cardDefinitions.Remove(card);
             }
 
-            cards.Remove(card);
             ReflowHand(true);
         }
 
         private void HandleCardLeftHand(IHandCard card)
         {
-            cards.Remove(card);
+            if (cards.Remove(card))
+            {
+                CardCombatAudio.PlayPlaceholder(cardDefinitions[card].Kind);
+            }
+
             ReflowHand(true);
         }
 
@@ -324,15 +334,14 @@ namespace RealtimeCardPrototype
             RefreshHud();
         }
 
-        public void ReceiveEnemyAttack(float damage)
+        public void ReceiveEnemyAttack(int damage)
         {
-            float clampedDamage = Mathf.Max(0f, damage);
-            if (clampedDamage <= 0f)
+            if (damage <= 0)
             {
                 return;
             }
 
-            bool defeated = healthState.ApplyDamage(clampedDamage);
+            bool defeated = healthState.ApplyDamage(damage);
             hudView.ShowDamageFlash(defeated ? 0.82f : 0.28f);
 
             if (defeated)

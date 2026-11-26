@@ -18,13 +18,13 @@ namespace RealtimeCardPrototype
         bool CanBeDirectTarget { get; }
         bool CanInterceptAttacks { get; }
         float InterceptRadius { get; }
-        void ReceiveEnemyAttack(float damage);
+        void ReceiveEnemyAttack(int damage);
     }
 
     public interface IPlayerDamageReceiver
     {
         Vector3 TargetPoint { get; }
-        void ReceiveEnemyAttack(float damage);
+        void ReceiveEnemyAttack(int damage);
     }
 
     public static class CombatTargetRegistry

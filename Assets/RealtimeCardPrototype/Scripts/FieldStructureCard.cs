@@ -27,13 +27,14 @@ namespace RealtimeCardPrototype
         private Vector3 handPosition;
         private Quaternion handRotation;
         private Vector3 targetPosition;
-        private float currentHealth;
+        private int currentHealth;
         private int manaCost;
         private bool isDragging;
         private bool isActiveOnField;
         private bool hasBeenPlayed;
         private bool hasLeftHand;
         private bool isPlayable = true;
+        private GameObject healthBar;
         private Transform healthFill;
         private TextMesh healthText;
 
@@ -43,15 +44,15 @@ namespace RealtimeCardPrototype
         public Transform TargetTransform => transform;
         public Vector3 TargetPoint => transform.position + Vector3.up * 0.42f;
         public virtual int TargetPriority => 0;
-        public bool IsTargetable => isActiveOnField && !hasBeenPlayed && currentHealth > 0f;
+        public bool IsTargetable => isActiveOnField && !hasBeenPlayed && currentHealth > 0;
         public virtual bool CanBeDirectTarget => true;
         public virtual bool CanInterceptAttacks => false;
         public virtual float InterceptRadius => 0f;
-        protected float CurrentHealth => currentHealth;
+        protected int CurrentHealth => currentHealth;
         protected bool IsActiveOnField => isActiveOnField;
         protected bool HasLeftHand => hasLeftHand;
 
-        protected virtual float InitialMaxHealth => 3f;
+        protected virtual int InitialMaxHealth => 3;
         protected virtual int DefaultManaCost => 1;
         protected virtual Color HealthBarFillColor => new Color(1f, 0.72f, 0.08f);
         protected virtual Color HealthBarBackgroundColor => new Color(0.09f, 0.025f, 0.03f);
@@ -122,6 +123,8 @@ namespace RealtimeCardPrototype
 
             isActiveOnField = true;
             cardCollider.isTrigger = true;
+            healthBar.SetActive(true);
+            cardView.SetEffectLabelVisible(false);
             OnStructureActivated();
             UpdateHealthBar();
             CombatTargetRegistry.RegisterStructure(this);
@@ -147,12 +150,12 @@ namespace RealtimeCardPrototype
             fieldPlacement.SetDragging(false);
         }
 
-        public void ReceiveEnemyAttack(float damage)
+        public void ReceiveEnemyAttack(int damage)
         {
             ApplyStructureDamage(damage);
         }
 
-        public void ApplyStructureDamage(float damage)
+        public void ApplyStructureDamage(int damage)
         {
             AbsorbStructureDamage(damage, false);
         }
@@ -192,19 +195,19 @@ namespace RealtimeCardPrototype
         {
         }
 
-        protected float AbsorbStructureDamage(float damage, bool consumeAfterAbsorb)
+        protected int AbsorbStructureDamage(int damage, bool consumeAfterAbsorb)
         {
+            int incomingDamage = Mathf.Max(0, damage);
             if (hasBeenPlayed || !isActiveOnField)
             {
-                return Mathf.Max(0f, damage);
+                return incomingDamage;
             }
 
-            float incomingDamage = Mathf.Max(0f, damage);
-            float absorbedDamage = Mathf.Min(currentHealth, incomingDamage);
+            int absorbedDamage = Mathf.Min(currentHealth, incomingDamage);
             currentHealth -= absorbedDamage;
             UpdateHealthBar();
 
-            if (consumeAfterAbsorb || currentHealth <= 0f)
+            if (consumeAfterAbsorb || currentHealth <= 0)
             {
                 FinishPlayed();
             }
@@ -260,6 +263,8 @@ namespace RealtimeCardPrototype
             isDragging = false;
             isActiveOnField = false;
             cardCollider.isTrigger = false;
+            healthBar.SetActive(false);
+            cardView.SetEffectLabelVisible(true);
             body.linearVelocity = Vector3.zero;
             body.angularVelocity = Vector3.zero;
             OnStructureDeactivated();
@@ -280,26 +285,26 @@ namespace RealtimeCardPrototype
 
         private void CreateHealthBar()
         {
-            GameObject root = new GameObject("HP Bar");
-            root.transform.SetParent(transform, false);
-            root.transform.localPosition = new Vector3(0f, cardView.OverlayHeight, -0.61f);
+            healthBar = new GameObject("HP Bar");
+            healthBar.transform.SetParent(transform, false);
+            healthBar.transform.localPosition = new Vector3(0f, cardView.OverlayHeight, -0.61f);
 
             GameObject background = GameObject.CreatePrimitive(PrimitiveType.Cube);
             background.name = "HP Bar Background";
-            background.transform.SetParent(root.transform, false);
+            background.transform.SetParent(healthBar.transform, false);
             background.transform.localScale = new Vector3(HealthBarWidth, 0.016f, 0.052f);
             background.GetComponent<Renderer>().sharedMaterial = PrototypeMaterials.Create(HealthBarBackgroundColor, 0.1f);
             DisableAndDestroyCollider(background.GetComponent<Collider>());
 
             GameObject fill = GameObject.CreatePrimitive(PrimitiveType.Cube);
             fill.name = "HP Bar Fill";
-            fill.transform.SetParent(root.transform, false);
+            fill.transform.SetParent(healthBar.transform, false);
             fill.transform.localScale = new Vector3(HealthBarWidth, 0.02f, 0.058f);
             fill.GetComponent<Renderer>().sharedMaterial = PrototypeMaterials.Create(HealthBarFillColor, 0.18f);
             DisableAndDestroyCollider(fill.GetComponent<Collider>());
 
             GameObject labelObject = new GameObject("HP Label");
-            labelObject.transform.SetParent(root.transform, false);
+            labelObject.transform.SetParent(healthBar.transform, false);
             labelObject.transform.localPosition = new Vector3(0f, 0.022f, -0.075f);
             labelObject.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
 
@@ -314,6 +319,7 @@ namespace RealtimeCardPrototype
 
             healthFill = fill.transform;
             UpdateHealthBar();
+            healthBar.SetActive(false);
         }
 
         private void UpdateHealthBar()
@@ -323,14 +329,14 @@ namespace RealtimeCardPrototype
                 return;
             }
 
-            float amount = InitialMaxHealth > 0f ? Mathf.Clamp01(currentHealth / InitialMaxHealth) : 0f;
+            float amount = Mathf.Clamp01((float)currentHealth / InitialMaxHealth);
             float width = HealthBarWidth * amount;
             healthFill.localScale = new Vector3(width, healthFill.localScale.y, healthFill.localScale.z);
             healthFill.localPosition = new Vector3(-HealthBarWidth * 0.5f + width * 0.5f, healthFill.localPosition.y, healthFill.localPosition.z);
 
             if (healthText != null)
             {
-                healthText.text = $"HP {currentHealth:0}/{InitialMaxHealth:0}";
+                healthText.text = $"HP {currentHealth}/{InitialMaxHealth}";
             }
         }
 

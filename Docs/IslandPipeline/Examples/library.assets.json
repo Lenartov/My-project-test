@@ -1,0 +1,18 @@
+{
+  "format": "island_asset_library",
+  "version": 1,
+  "assets": [
+    {
+      "asset_id": "Platform_Forest_Rect_A",
+      "model_path": "Models/Platform_Forest_Rect_A.fbx"
+    },
+    {
+      "asset_id": "Tree_Pine_A",
+      "model_path": "Models/Tree_Pine_A.fbx"
+    },
+    {
+      "asset_id": "Rock_A",
+      "model_path": "Models/Rock_A.fbx"
+    }
+  ]
+}

@@ -134,6 +134,7 @@ namespace RealtimeCardPrototype
 
             isActiveOnField = true;
             lifetimeTimer = 0f;
+            CardCombatEffects.PoisonAura(transform, hoverHalfExtents, activeLifetime);
             LeftHand?.Invoke(this);
             UpdateChargeBar();
             BeginDrag();
@@ -216,6 +217,7 @@ namespace RealtimeCardPrototype
             hasBeenPlayed = true;
             isDragging = false;
             isActiveOnField = false;
+            cardView.ReleaseMotionEffects();
             Played?.Invoke(this);
             Destroy(gameObject);
         }

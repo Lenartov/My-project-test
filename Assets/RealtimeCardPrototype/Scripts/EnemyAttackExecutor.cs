@@ -44,7 +44,7 @@ namespace RealtimeCardPrototype
             return new EnemyAttackPlan(EnemyAttackTargetMode.Player, null, player, CreatePlayerAttackPoint());
         }
 
-        public void ShowTelegraph(EnemyAttackPlan plan, float damage)
+        public void ShowTelegraph(EnemyAttackPlan plan, int damage)
         {
             if (isDying())
             {
@@ -90,9 +90,9 @@ namespace RealtimeCardPrototype
             }
         }
 
-        public void Execute(EnemyAttackPlan plan, float damage)
+        public void Execute(EnemyAttackPlan plan, int damage)
         {
-            if (isDying())
+            if (damage <= 0 || isDying())
             {
                 return;
             }
@@ -109,7 +109,7 @@ namespace RealtimeCardPrototype
             {
                 interceptor.ReceiveEnemyAttack(damage);
                 AttackProjectile.Spawn(source, interceptor.TargetPoint, damage);
-                Debug.Log($"{owner.name} attack intercepted by {interceptor.TargetTransform.name} for {damage:0.0}");
+                Debug.Log($"{owner.name} attack intercepted by {interceptor.TargetTransform.name} for {damage}");
                 return;
             }
 
@@ -117,7 +117,7 @@ namespace RealtimeCardPrototype
             {
                 plan.StructureTarget.ReceiveEnemyAttack(damage);
                 AttackProjectile.Spawn(source, plan.StructureTarget.TargetPoint, damage);
-                Debug.Log($"{owner.name} attacks structure {plan.StructureTarget.TargetTransform.name} for {damage:0.0}");
+                Debug.Log($"{owner.name} attacks structure {plan.StructureTarget.TargetTransform.name} for {damage}");
                 return;
             }
 
@@ -125,18 +125,18 @@ namespace RealtimeCardPrototype
             {
                 plan.PlayerTarget.ReceiveEnemyAttack(damage);
                 AttackProjectile.Spawn(source, targetPoint, damage);
-                Debug.Log($"{owner.name} attacks player for {damage:0.0}");
+                Debug.Log($"{owner.name} attacks player for {damage}");
             }
         }
 
-        public void ExecuteBlockChain(EnemyAttackPlan plan, int hitIndex, List<ShieldBlockerCard> blocks, float damage)
+        public void ExecuteBlockChain(EnemyAttackPlan plan, int hitIndex, List<ShieldBlockerCard> blocks, int damage)
         {
             Vector3 source = GetAttackSource();
             Vector3 previousPoint = source;
-            float remainingDamage = Mathf.Max(0f, damage);
+            int remainingDamage = damage;
             int blockIndex = 0;
 
-            for (; blockIndex < blocks.Count && remainingDamage > 0f; blockIndex++)
+            for (; blockIndex < blocks.Count && remainingDamage > 0; blockIndex++)
             {
                 ShieldBlockerCard block = blocks[blockIndex];
                 if (block == null || !block.IsTargetable)
@@ -159,7 +159,7 @@ namespace RealtimeCardPrototype
                 }
             }
 
-            if (remainingDamage > 0f && plan.HasPlayerTarget)
+            if (remainingDamage > 0 && plan.HasPlayerTarget)
             {
                 Vector3 playerTargetPoint = plan.Sequence != null
                     ? plan.Sequence.GetHitTargetPoint(plan.TargetPoint, hitIndex)
@@ -224,7 +224,7 @@ namespace RealtimeCardPrototype
             line.SetPosition(0, segment.Start);
             line.SetPosition(1, segment.End);
             damageText.gameObject.SetActive(true);
-            damageText.text = segment.Damage.ToString("0");
+            damageText.text = segment.Damage.ToString();
             damageText.transform.position = Vector3.Lerp(segment.Start, segment.End, 0.5f) + Vector3.up * 0.14f;
             Camera camera = Camera.main;
             if (camera != null)

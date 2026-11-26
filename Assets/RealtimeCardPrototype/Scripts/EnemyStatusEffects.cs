@@ -25,7 +25,7 @@ namespace RealtimeCardPrototype
         private float poisonTickTimer;
         private float shockRemaining;
         private float shockChainPopupTimer;
-        private float shockChainPopupDamage;
+        private int shockChainPopupDamage;
 
         public EnemyStatusEffects(
             float poisonDuration,
@@ -74,17 +74,17 @@ namespace RealtimeCardPrototype
             shockRemaining = shockMarkDuration;
         }
 
-        public float GetShockChainDamage(float sourceDamage)
+        public float GetShockChainDamage(int sourceDamage)
         {
             return sourceDamage * shockChainDamageFraction;
         }
 
-        public void AccumulateShockPopup(float damage)
+        public void AccumulateShockPopup(int damage)
         {
             shockChainPopupDamage += damage;
         }
 
-        public void Tick(float deltaTime, float currentTime, Action<float> applyPoisonDamage, Action<float> showShockPopup)
+        public void Tick(float deltaTime, float currentTime, Action<float> applyPoisonDamage, Action<int> showShockPopup)
         {
             TickPoison(deltaTime, currentTime, applyPoisonDamage);
             TickShockMark(deltaTime);
@@ -144,9 +144,9 @@ namespace RealtimeCardPrototype
             shockRemaining = Mathf.Max(0f, shockRemaining - deltaTime);
         }
 
-        private void TickShockPopup(float deltaTime, Action<float> showShockPopup)
+        private void TickShockPopup(float deltaTime, Action<int> showShockPopup)
         {
-            if (shockChainPopupDamage <= 0f)
+            if (shockChainPopupDamage <= 0)
             {
                 shockChainPopupTimer = 0f;
                 return;
@@ -157,7 +157,7 @@ namespace RealtimeCardPrototype
             {
                 showShockPopup(shockChainPopupDamage);
                 shockChainPopupTimer = 0f;
-                shockChainPopupDamage = 0f;
+                shockChainPopupDamage = 0;
             }
         }
 

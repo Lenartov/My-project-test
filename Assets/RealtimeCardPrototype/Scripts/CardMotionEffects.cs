@@ -12,7 +12,6 @@ namespace RealtimeCardPrototype
         internal void Configure(CardKind kind, IHandCard handCard, float width, float height)
         {
             card = handCard;
-            Color color = CardCombatEffects.GetColor(kind);
             float edge = width * 0.37f;
 
             switch (kind)
@@ -20,32 +19,71 @@ namespace RealtimeCardPrototype
                 case CardKind.Strike:
                     trails = new[]
                     {
-                        CreateTrail(new Vector3(-edge, height, 0f), 0.18f, 0.21f, color, 0.65f),
-                        CreateTrail(new Vector3(edge, height, 0f), 0.11f, 0.14f, color, 0.8f)
+                        CreateTrail(new Vector3(-edge, height, 0f), 0.26f, 0.17f, CardCombatEffects.Gold, CardCombatEffects.Cream),
+                        CreateTrail(new Vector3(edge, height, 0f), 0.09f, 0.13f, CardCombatEffects.Cream, CardCombatEffects.Cream)
                     };
                     break;
                 case CardKind.Heavy:
                     trails = new[]
                     {
-                        CreateTrail(new Vector3(0f, height - 0.12f, 0f), 0.78f, 0.37f, color, 0.37f),
-                        CreateTrail(new Vector3(-edge, height, 0f), 0.19f, 0.29f, color, 0.9f),
-                        CreateTrail(new Vector3(edge, height, 0f), 0.19f, 0.29f, color, 0.9f)
+                        CreateTrail(new Vector3(0f, height - 0.12f, 0f), 0.64f, 0.24f, CardCombatEffects.Coral, CardCombatEffects.Amber),
+                        CreateTrail(new Vector3(edge * 1.25f, height - 0.05f, 0f), 0.12f, 0.18f, CardCombatEffects.Coral, CardCombatEffects.Coral)
                     };
                     break;
                 case CardKind.Blast:
                     trails = new[]
                     {
-                        CreateTrail(new Vector3(0f, height - 0.06f, 0f), 0.64f, 0.31f, color, 0.48f),
-                        CreateTrail(new Vector3(-edge * 0.65f, height, 0f), 0.14f, 0.22f, Color.yellow, 0.8f),
-                        CreateTrail(new Vector3(edge * 0.65f, height, 0f), 0.14f, 0.16f, color, 0.85f)
+                        CreateTrail(new Vector3(-edge * 0.64f, height - 0.04f, 0f), 0.28f, 0.20f, CardCombatEffects.Amber, CardCombatEffects.Gold),
+                        CreateTrail(new Vector3(edge * 0.83f, height + 0.02f, 0f), 0.18f, 0.15f, CardCombatEffects.Coral, CardCombatEffects.Amber)
+                    };
+                    break;
+                case CardKind.Shock:
+                    trails = new[]
+                    {
+                        CreateTrail(new Vector3(-edge, height, 0f), 0.21f, 0.15f, CardCombatEffects.ElectricBlue, CardCombatEffects.Cream),
+                        CreateTrail(new Vector3(edge, height, 0f), 0.10f, 0.11f, CardCombatEffects.Ice, CardCombatEffects.Ice)
+                    };
+                    break;
+                case CardKind.Poison:
+                    trails = new[]
+                    {
+                        CreateTrail(new Vector3(-edge * 0.6f, height - 0.12f, 0f), 0.25f, 0.19f, CardCombatEffects.PoisonGreen, CardCombatEffects.Lime),
+                        CreateTrail(new Vector3(edge, height - 0.05f, 0f), 0.13f, 0.13f, CardCombatEffects.PoisonGreen, CardCombatEffects.PoisonGreen)
+                    };
+                    break;
+                case CardKind.Focus:
+                    trails = new[]
+                    {
+                        CreateTrail(new Vector3(-edge, height, 0f), 0.16f, 0.23f, CardCombatEffects.Turquoise, CardCombatEffects.Ice),
+                        CreateTrail(new Vector3(edge * 0.76f, height + 0.08f, 0f), 0.09f, 0.17f, CardCombatEffects.ElectricBlue, CardCombatEffects.Ice)
+                    };
+                    break;
+                case CardKind.Turret:
+                    trails = new[]
+                    {
+                        CreateTrail(new Vector3(-edge, height, 0f), 0.14f, 0.16f, CardCombatEffects.Amber, CardCombatEffects.Gold),
+                        CreateTrail(new Vector3(edge, height, 0f), 0.14f, 0.16f, CardCombatEffects.Amber, CardCombatEffects.Gold)
+                    };
+                    break;
+                case CardKind.Pierce:
+                    trails = new[]
+                    {
+                        CreateTrail(new Vector3(-edge, height + 0.06f, 0f), 0.13f, 0.19f, CardCombatEffects.PierceMint, CardCombatEffects.Ice),
+                        CreateTrail(new Vector3(edge, height + 0.06f, 0f), 0.13f, 0.19f, CardCombatEffects.PierceMint, CardCombatEffects.Ice)
+                    };
+                    break;
+                case CardKind.Power:
+                    trails = new[]
+                    {
+                        CreateTrail(new Vector3(-edge, height, 0f), 0.17f, 0.17f, CardCombatEffects.Gold, CardCombatEffects.Cream),
+                        CreateTrail(new Vector3(edge, height + 0.05f, 0f), 0.09f, 0.12f, CardCombatEffects.Amber, CardCombatEffects.Gold)
                     };
                     break;
                 default:
                     trails = new[]
                     {
-                        CreateTrail(new Vector3(0f, height - 0.06f, 0f), 0.55f, 0.26f, color, 0.33f),
-                        CreateTrail(new Vector3(-edge, height, 0f), 0.12f, 0.26f, color, 0.77f),
-                        CreateTrail(new Vector3(edge, height, 0f), 0.12f, 0.26f, color, 0.77f)
+                        CreateTrail(new Vector3(-edge, height - 0.04f, 0f), 0.18f, 0.16f, CardCombatEffects.Turquoise, CardCombatEffects.Ice),
+                        CreateTrail(new Vector3(edge, height - 0.04f, 0f), 0.18f, 0.16f, CardCombatEffects.Turquoise, CardCombatEffects.Ice)
                     };
                     break;
             }
@@ -77,29 +115,27 @@ namespace RealtimeCardPrototype
             }
         }
 
-        private TrailRenderer CreateTrail(Vector3 offset, float width, float lifetime, Color color, float opacity)
+        private TrailRenderer CreateTrail(Vector3 offset, float width, float lifetime, Color tail, Color tip)
         {
             GameObject trailObject = new GameObject("Card Motion Ribbon");
             trailObject.transform.SetParent(transform, false);
             trailObject.transform.localPosition = offset;
 
             TrailRenderer trail = trailObject.AddComponent<TrailRenderer>();
-            trail.sharedMaterial = CardCombatEffects.RibbonMaterial;
+            trail.sharedMaterial = CardCombatEffects.Material;
             trail.shadowCastingMode = ShadowCastingMode.Off;
             trail.receiveShadows = false;
             trail.time = lifetime;
-            trail.minVertexDistance = 0.035f;
-            trail.numCornerVertices = 3;
-            trail.numCapVertices = 3;
+            trail.minVertexDistance = 0.08f;
             trail.alignment = LineAlignment.View;
             trail.textureMode = LineTextureMode.Stretch;
             trail.widthMultiplier = width;
             trail.widthCurve = new AnimationCurve(
-                new Keyframe(0f, 1f), new Keyframe(0.4f, 0.62f), new Keyframe(1f, 0f));
+                new Keyframe(0f, 0.52f), new Keyframe(0.22f, 1f), new Keyframe(0.55f, 0.68f), new Keyframe(1f, 0f));
             trail.colorGradient = new Gradient
             {
-                colorKeys = new[] { new GradientColorKey(Color.Lerp(color, Color.white, 0.62f), 0f), new GradientColorKey(color, 0.52f), new GradientColorKey(color, 1f) },
-                alphaKeys = new[] { new GradientAlphaKey(opacity, 0f), new GradientAlphaKey(opacity * 0.55f, 0.42f), new GradientAlphaKey(0f, 1f) }
+                colorKeys = new[] { new GradientColorKey(tip, 0f), new GradientColorKey(tail, 0.64f), new GradientColorKey(tail, 1f) },
+                alphaKeys = new[] { new GradientAlphaKey(1f, 0f), new GradientAlphaKey(1f, 1f) }
             };
             trail.emitting = false;
             return trail;
